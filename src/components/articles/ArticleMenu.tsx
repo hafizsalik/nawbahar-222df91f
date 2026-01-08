@@ -1,4 +1,4 @@
-import { MoreHorizontal, Pencil, Trash2, Flag, Share2 } from "lucide-react";
+import { MoreVertical, Pencil, Trash2, Flag, Share2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -92,7 +92,7 @@ export function ArticleMenu({
             className="h-8 w-8 text-muted-foreground hover:text-foreground"
             onClick={(e) => e.preventDefault()}
           >
-            <MoreHorizontal size={18} />
+            <MoreVertical size={18} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent 
@@ -100,6 +100,12 @@ export function ArticleMenu({
           className="w-40 bg-popover border border-border z-50"
           onClick={(e) => e.preventDefault()}
         >
+          {/* Share is always visible for everyone */}
+          <DropdownMenuItem onClick={handleShare} className="gap-2 cursor-pointer">
+            <Share2 size={16} />
+            <span>اشتراک‌گذاری</span>
+          </DropdownMenuItem>
+
           {canManage ? (
             <>
               <DropdownMenuItem onClick={handleEdit} className="gap-2 cursor-pointer">
@@ -115,16 +121,10 @@ export function ArticleMenu({
               </DropdownMenuItem>
             </>
           ) : (
-            <>
-              <DropdownMenuItem onClick={handleShare} className="gap-2 cursor-pointer">
-                <Share2 size={16} />
-                <span>اشتراک‌گذاری</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleReport} className="gap-2 cursor-pointer">
-                <Flag size={16} />
-                <span>گزارش</span>
-              </DropdownMenuItem>
-            </>
+            <DropdownMenuItem onClick={handleReport} className="gap-2 cursor-pointer">
+              <Flag size={16} />
+              <span>گزارش</span>
+            </DropdownMenuItem>
           )}
         </DropdownMenuContent>
       </DropdownMenu>

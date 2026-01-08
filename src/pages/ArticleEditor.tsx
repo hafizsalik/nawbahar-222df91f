@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, Send, ImagePlus, X, Tag } from "lucide-react";
+import { ArrowRight, Send, ImagePlus, X, Tag, Quote, Search } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useArticleSearch } from "@/hooks/useCitations";
 import type { User } from "@supabase/supabase-js";
 
 const categories = [
@@ -18,6 +19,11 @@ const categories = [
   { id: "health", label: "سلامت", icon: "🏥" },
 ];
 
+interface SelectedCitation {
+  id: string;
+  title: string;
+}
+
 const ArticleEditor = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -27,6 +33,13 @@ const ArticleEditor = () => {
   const [tagsInput, setTagsInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  
+  // Citation state
+  const [citationSearch, setCitationSearch] = useState("");
+  const [selectedCitations, setSelectedCitations] = useState<SelectedCitation[]>([]);
+  const [showCitationResults, setShowCitationResults] = useState(false);
+  const { results: citationResults, searching, searchArticles } = useArticleSearch();
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -52,6 +65,19 @@ const ArticleEditor = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  // Debounced citation search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (citationSearch.trim().length >= 2) {
+        searchArticles(citationSearch);
+        setShowCitationResults(true);
+      } else {
+        setShowCitationResults(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [citationSearch]);
 
   const handlePublish = async () => {
     if (!title.trim() || !content.trim()) {
@@ -100,20 +126,31 @@ const ArticleEditor = () => {
       // Add category as the first tag if selected
       const allTags = category ? [category, ...parsedTags] : parsedTags;
 
-      const { error } = await supabase.from("articles").insert({
+      // Insert article with PUBLISHED status (instant publish)
+      const { data: articleData, error } = await supabase.from("articles").insert({
         title: title.trim(),
         content: content.trim(),
         author_id: user.id,
-        status: "pending",
+        status: "published",
         cover_image_url: coverImageUrl,
         tags: allTags,
-      });
+      }).select("id").single();
 
       if (error) throw error;
 
+      // Insert citations if any
+      if (selectedCitations.length > 0 && articleData?.id) {
+        const citationInserts = selectedCitations.map(citation => ({
+          source_article_id: articleData.id,
+          cited_article_id: citation.id,
+        }));
+
+        await supabase.from("citations").insert(citationInserts);
+      }
+
       toast({
         title: "موفق!",
-        description: "مقاله شما ثبت شد و پس از بررسی منتشر خواهد شد",
+        description: "مقاله شما با موفقیت منتشر شد",
       });
       navigate("/");
     } catch (error: any) {
@@ -154,13 +191,25 @@ const ArticleEditor = () => {
     }
   };
 
+  const addCitation = (article: { id: string; title: string }) => {
+    if (!selectedCitations.find(c => c.id === article.id)) {
+      setSelectedCitations([...selectedCitations, article]);
+    }
+    setCitationSearch("");
+    setShowCitationResults(false);
+  };
+
+  const removeCitation = (id: string) => {
+    setSelectedCitations(selectedCitations.filter(c => c.id !== id));
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-card/98 backdrop-blur-xl border-b border-border">
+      <header className="sticky top-0 z-50 bg-card border-b border-border">
         <div className="flex items-center justify-between px-4 h-14 max-w-screen-md mx-auto">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/")}
             className="p-2 -mr-2 text-muted-foreground hover:text-foreground"
           >
             <ArrowRight size={24} />
@@ -244,6 +293,55 @@ const ArticleEditor = () => {
                 className="pr-10"
               />
             </div>
+          </div>
+
+          {/* Citation Search */}
+          <div className="relative">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+              <Quote size={16} />
+              <span>ارجاع به مقالات دیگر</span>
+            </div>
+            <div className="relative">
+              <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="جستجوی مقاله برای ارجاع..."
+                value={citationSearch}
+                onChange={(e) => setCitationSearch(e.target.value)}
+                className="pr-10"
+              />
+            </div>
+            
+            {/* Citation Search Results */}
+            {showCitationResults && citationResults.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-popover border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                {citationResults.map((article) => (
+                  <button
+                    key={article.id}
+                    onClick={() => addCitation(article)}
+                    className="w-full text-right px-4 py-2 hover:bg-muted transition-colors text-sm"
+                  >
+                    {article.title}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Selected Citations */}
+            {selectedCitations.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {selectedCitations.map((citation) => (
+                  <div
+                    key={citation.id}
+                    className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-sm"
+                  >
+                    <span className="line-clamp-1 max-w-48">{citation.title}</span>
+                    <button onClick={() => removeCitation(citation.id)}>
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <Textarea
