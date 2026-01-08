@@ -109,6 +109,42 @@ export type Database = {
           },
         ]
       }
+      citations: {
+        Row: {
+          cited_article_id: string
+          created_at: string
+          id: string
+          source_article_id: string
+        }
+        Insert: {
+          cited_article_id: string
+          created_at?: string
+          id?: string
+          source_article_id: string
+        }
+        Update: {
+          cited_article_id?: string
+          created_at?: string
+          id?: string
+          source_article_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "citations_cited_article_id_fkey"
+            columns: ["cited_article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "citations_source_article_id_fkey"
+            columns: ["source_article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           article_id: string

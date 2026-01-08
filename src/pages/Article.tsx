@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, Heart, Bookmark, Share2, BadgeCheck, Star } from "lucide-react";
+import { ArrowRight, Heart, Bookmark, Share2, BadgeCheck, Star, Quote } from "lucide-react";
 import { formatSolarShort } from "@/lib/solarHijri";
 import { cn } from "@/lib/utils";
 import { useArticleInteractions } from "@/hooks/useArticleInteractions";
 import { useComments } from "@/hooks/useComments";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useCitations } from "@/hooks/useCitations";
 import { CommentSection } from "@/components/articles/CommentSection";
 import { ArticleRatingModal } from "@/components/admin/ArticleRatingModal";
 import { Button } from "@/components/ui/button";
@@ -49,6 +50,7 @@ const Article = () => {
   
   const { user } = useAuth();
   const { isAdmin } = useUserRole();
+  const { citations, citationCount, loading: citationsLoading } = useCitations(id || "");
 
   const {
     isLiked,
@@ -76,7 +78,6 @@ const Article = () => {
   const fetchArticle = async (articleId: string) => {
     setLoading(true);
     
-    // First fetch the article with all scores
     const { data: articleData, error: articleError } = await supabase
       .from("articles")
       .select("id, title, content, cover_image_url, tags, created_at, save_count, author_id, editorial_score_science, editorial_score_ethics, editorial_score_writing, editorial_score_timing, editorial_score_innovation")
@@ -89,7 +90,6 @@ const Article = () => {
       return;
     }
 
-    // Then fetch the author profile
     const { data: profileData } = await supabase
       .from("profiles")
       .select("display_name, avatar_url, specialty, reputation_score")
@@ -154,7 +154,7 @@ const Article = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border">
+      <header className="sticky top-0 z-50 bg-background border-b border-border">
         <div className="flex items-center justify-between px-4 h-14 max-w-screen-md mx-auto">
           <button
             onClick={() => navigate(-1)}
@@ -163,7 +163,6 @@ const Article = () => {
             <ArrowRight size={24} />
           </button>
           <div className="flex items-center gap-2">
-            {/* Admin Rating Button */}
             {isAdmin && (
               <Button
                 variant="ghost"
@@ -187,6 +186,12 @@ const Article = () => {
                 <span className="text-sm text-muted-foreground">{likeCount}</span>
               )}
             </button>
+            <div className="flex items-center gap-1.5 p-2 text-muted-foreground">
+              <Quote size={18} />
+              {citationCount > 0 && (
+                <span className="text-sm">{citationCount}</span>
+              )}
+            </div>
             <button
               onClick={toggleBookmark}
               className="p-2 transition-colors"
@@ -286,6 +291,32 @@ const Article = () => {
                 #{tag}
               </span>
             ))}
+          </div>
+        )}
+
+        {/* References Section */}
+        {citations.length > 0 && (
+          <div className="mt-8 pt-6 border-t border-border">
+            <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
+              <Quote size={20} className="text-primary" />
+              <span>منابع و ارجاعات</span>
+            </h3>
+            <ul className="space-y-3">
+              {citations.map((citation, index) => (
+                <li key={citation.id}>
+                  <Link 
+                    to={`/article/${citation.id}`}
+                    className="flex items-start gap-2 text-sm hover:text-primary transition-colors"
+                  >
+                    <span className="text-muted-foreground">[{index + 1}]</span>
+                    <span className="text-foreground hover:text-primary">
+                      {citation.title}
+                      <span className="text-muted-foreground mr-2">— {citation.author_name}</span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 
