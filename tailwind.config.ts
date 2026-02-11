@@ -18,7 +18,7 @@ export default {
   	extend: {
   		fontFamily: {
   			sans: [
-  				'Figtree',
+  				'Plus Jakarta Sans',
   				'ui-sans-serif',
   				'system-ui',
   				'sans-serif',
