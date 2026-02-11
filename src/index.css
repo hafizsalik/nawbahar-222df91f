@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Figtree&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -67,6 +69,8 @@
     --sidebar-accent-foreground: 220 15% 25%;
     --sidebar-border: 40 10% 89%;
     --sidebar-ring: 174 50% 32%;
+    --font-sans: Figtree, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    --font-serif: "Playfair Display", ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
   }
 
   .dark {
@@ -118,6 +122,8 @@
     --sidebar-accent-foreground: 40 8% 85%;
     --sidebar-border: 220 14% 16%;
     --sidebar-ring: 174 45% 42%;
+    --font-sans: Figtree, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    --font-serif: "Playfair Display", ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
   }
 }
 

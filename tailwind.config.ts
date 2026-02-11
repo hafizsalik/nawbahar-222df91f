@@ -18,6 +18,7 @@ export default {
   	extend: {
   		fontFamily: {
   			sans: [
+  				'Figtree',
   				'ui-sans-serif',
   				'system-ui',
   				'sans-serif',
@@ -27,6 +28,7 @@ export default {
   				'Noto Color Emoji'
   			],
   			serif: [
+  				'Playfair Display',
   				'ui-serif',
   				'Georgia',
   				'Cambria',
@@ -102,13 +104,13 @@ export default {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
-		boxShadow: {
-			sm: 'var(--shadow-sm)',
-			md: 'var(--shadow-md)',
-			lg: 'var(--shadow-lg)',
-			card: 'var(--shadow-card)',
-			'card-hover': 'var(--shadow-card-hover)'
-		},
+  		boxShadow: {
+  			sm: 'var(--shadow-sm)',
+  			md: 'var(--shadow-md)',
+  			lg: 'var(--shadow-lg)',
+  			card: 'var(--shadow-card)',
+  			'card-hover': 'var(--shadow-card-hover)'
+  		},
   		keyframes: {
   			'accordion-down': {
   				from: {
