@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Trash2, Send, ThumbsUp, CornerDownRight, MoreVertical, Flag } from "lucide-react";
+import { Trash2, Send, ThumbsUp, CornerDownRight, MoreVertical, Flag, FileText } from "lucide-react";
 import { getRelativeTime } from "@/lib/relativeTime";
 import { cn, toPersianNumber } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +15,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Comment } from "@/hooks/useComments";
 
+interface ResponseArticle {
+  id: string;
+  title: string;
+  created_at: string;
+  author: { display_name: string; avatar_url: string | null } | null;
+}
+
 interface CommentSectionProps {
   comments: Comment[];
   loading: boolean;
@@ -22,6 +29,7 @@ interface CommentSectionProps {
   userId: string | null;
   onAddComment: (content: string, parentId?: string) => Promise<boolean>;
   onDeleteComment: (commentId: string) => Promise<void>;
+  responses?: ResponseArticle[];
 }
 
 export function CommentSection({
@@ -31,6 +39,7 @@ export function CommentSection({
   userId,
   onAddComment,
   onDeleteComment,
+  responses = [],
 }: CommentSectionProps) {
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
@@ -84,10 +93,32 @@ export function CommentSection({
   return (
     <div>
       <h3 className="text-sm font-semibold text-foreground mb-5">
-        نظرات {comments.length > 0 && (
-          <span className="text-muted-foreground/50 font-normal">({toPersianNumber(comments.length)})</span>
+        نظرات و پاسخ‌ها {(comments.length + responses.length) > 0 && (
+          <span className="text-muted-foreground/50 font-normal">({toPersianNumber(comments.length + responses.length)})</span>
         )}
       </h3>
+
+      {/* Response Articles in Comments */}
+      {responses.length > 0 && (
+        <div className="mb-5 space-y-2">
+          {responses.map((r) => (
+            <Link
+              key={r.id}
+              to={`/article/${r.id}`}
+              className="flex items-center gap-2.5 p-3 rounded-lg bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-colors"
+            >
+              <FileText size={14} className="text-primary shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-foreground line-clamp-1">{r.title}</p>
+                {r.author && (
+                  <span className="text-[11px] text-muted-foreground/50">{r.author.display_name}</span>
+                )}
+              </div>
+              <span className="text-[10px] text-primary/60 shrink-0">پاسخ مقاله</span>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {/* Comment Input */}
       <div className="flex gap-2.5 mb-6">
