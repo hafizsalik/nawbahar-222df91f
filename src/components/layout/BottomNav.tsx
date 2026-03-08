@@ -60,12 +60,12 @@ export function BottomNav() {
             aria-label="نوشتن مقاله"
           >
             <div className={cn(
-              "w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200",
+              "w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-300",
               isActive("/write")
-                ? "bg-foreground text-background scale-105"
-                : "bg-muted text-muted-foreground group-active:scale-90 group-active:bg-foreground/15"
+                ? "bg-primary text-primary-foreground shadow-md scale-105"
+                : "bg-secondary text-foreground/70 group-active:scale-90 group-hover:bg-secondary/70"
             )}>
-              <Plus size={20} strokeWidth={2} />
+              <Plus size={21} strokeWidth={2.2} />
             </div>
           </Link>
 
