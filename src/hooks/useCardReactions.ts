@@ -1,20 +1,24 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const REACTION_EMOJIS: Record<string, string> = {
   like: "👍",
-  clap: "👏",
   love: "❤️",
+  laugh: "😂",
+  clap: "👏",
   insightful: "💡",
   fire: "🔥",
+  sad: "😢",
 };
 
 export const REACTION_LABELS: Record<string, string> = {
   like: "پسند",
-  clap: "تحسین",
   love: "عالی",
+  laugh: "خنده",
+  clap: "تحسین",
   insightful: "آموزنده",
   fire: "الهام‌بخش",
+  sad: "غمگین",
 };
 
 export type ReactionKey = keyof typeof REACTION_EMOJIS;
@@ -38,7 +42,7 @@ const EMPTY_SUMMARY: ReactionSummary = {
  * Uses article.reaction_count for display count.
  * Full reaction data is only fetched on first user interaction.
  */
-export function useCardReactions(articleId: string) {
+export function useCardReactions(articleId: string, autoFetch = true) {
   const [summary, setSummary] = useState<ReactionSummary>(EMPTY_SUMMARY);
   const [fetched, setFetched] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -93,6 +97,13 @@ export function useCardReactions(articleId: string) {
     setSummary({ topTypes, totalCount: reactions.length, reactorNames, userReaction });
     setFetched(true);
   }, [articleId]);
+
+  // Auto-fetch on mount for persistent display
+  useEffect(() => {
+    if (autoFetch && !fetched) {
+      fetchReactions();
+    }
+  }, [autoFetch, fetched, fetchReactions]);
 
   const ensureFetched = useCallback(async () => {
     if (!fetched) await fetchReactions();
