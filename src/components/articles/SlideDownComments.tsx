@@ -170,6 +170,7 @@ export function SlideDownComments({
       clearImage();
     } catch (error: any) {
       toast({ title: "خطا", description: "مشکلی پیش آمد", variant: "destructive" });
+      playErrorSound();
     } finally {
       setPublishingPublic(false);
     }
