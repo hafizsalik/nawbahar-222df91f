@@ -48,6 +48,7 @@ export function ArticleCard({ article, onDelete: _onDelete }: ArticleCardProps) 
     submitting,
   } = useComments(article.id);
   const { responseCount, parentArticle } = useResponseArticles(article.id);
+  const { summary: reactionSummary, toggleReaction } = useCardReactions(article.id);
   const [showComments, setShowComments] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
