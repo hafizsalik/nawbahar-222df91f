@@ -211,6 +211,21 @@ export function EditProfileModal({
             />
           </div>
 
+          {/* Bio */}
+          <div className="space-y-1.5">
+            <Label htmlFor="bio" className="text-sm">درباره من</Label>
+            <Textarea
+              id="bio"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              placeholder="معرفی کوتاه از خودتان..."
+              className="text-sm min-h-[70px] resize-none"
+              maxLength={500}
+            />
+            <p className="text-[10px] text-muted-foreground text-left" dir="ltr">{bio.length}/500</p>
+          </div>
+          </div>
+
           {/* Social Links */}
           <div className="pt-2 border-t border-border">
             <p className="text-xs text-muted-foreground mb-3">لینک‌های اجتماعی (اختیاری)</p>

@@ -326,10 +326,10 @@ const Profile = () => {
           userId={user.id}
           currentDisplayName={profile.display_name}
           currentSpecialty={profile.specialty}
+          currentBio={profile.bio}
           currentAvatarUrl={profile.avatar_url}
           currentWhatsapp={profile.whatsapp_number}
           currentFacebook={profile.facebook_url}
-          currentLinkedin={profile.linkedin_url}
           onUpdate={refetch}
         />
       )}
