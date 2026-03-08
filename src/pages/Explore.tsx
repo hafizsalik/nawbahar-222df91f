@@ -232,13 +232,6 @@ const Explore = () => {
           </div>
         )}
 
-        {/* About link */}
-        <div className="px-5 py-4 border-t border-border/40">
-          <Link to="/about" className="flex items-center gap-1.5 text-[11px] text-muted-foreground/30 hover:text-foreground transition-colors">
-            <Info size={12} />
-            <span>درباره نوبهار</span>
-          </Link>
-        </div>
       </div>
     </AppLayout>
   );
