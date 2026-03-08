@@ -36,8 +36,8 @@ export function ArticleCardMetrics({
 
   const displayCount = totalCount > 0 ? totalCount : reactionCount;
 
-  const buildReactionLabel = (): string => {
-    if (displayCount === 0) return "پسند";
+  const buildReactionLabel = (): string | null => {
+    if (displayCount === 0) return null;
 
     if (totalCount === 0 && reactionCount > 0) {
       return `${toPersianNumber(reactionCount)} نفر`;
