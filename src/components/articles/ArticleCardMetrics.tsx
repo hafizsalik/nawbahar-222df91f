@@ -100,7 +100,7 @@ export function ArticleCardMetrics({
             />
           </div>
 
-          {isRead && <CheckCheck size={12} strokeWidth={2} className="text-primary/35" />}
+          {isRead && <CheckCheck size={12} strokeWidth={2} className="text-primary/35" aria-label="خوانده شده" />}
         </div>
       </div>
 

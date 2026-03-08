@@ -114,14 +114,16 @@ export function BottomNav() {
 }
 
 /** Reusable nav item with tactile press feedback */
-function NavItem({ to, active, children }: { to: string; active: boolean; children: React.ReactNode }) {
+function NavItem({ to, active, children, label }: { to: string; active: boolean; children: React.ReactNode; label?: string }) {
   return (
     <Link
       to={to}
       className={cn(
-        "flex items-center justify-center flex-1 h-full focus:outline-none group transition-colors duration-200",
+        "flex items-center justify-center flex-1 h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-md group transition-colors duration-200",
         active ? "text-foreground" : "text-muted-foreground/40"
       )}
+      aria-label={label}
+      aria-current={active ? "page" : undefined}
     >
       <div className="relative flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 group-active:scale-90">
         {children}
