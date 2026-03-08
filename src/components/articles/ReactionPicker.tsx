@@ -143,23 +143,30 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
             boxShadow: "0 -4px 20px -4px hsl(var(--foreground) / 0.12), 0 0 0 1px hsl(var(--border) / 0.6)",
           }}
         >
-          {Object.entries(REACTION_EMOJIS).map(([key, emoji], i) => (
-            <button
-              key={key}
-              onClick={(e) => handleSelect(key as ReactionKey, e)}
-              className={cn(
-                "w-[40px] h-[40px] sm:w-[32px] sm:h-[32px] flex flex-col items-center justify-center rounded-full text-[22px] sm:text-[18px] transition-all duration-150",
-                "hover:scale-[1.25] hover:-translate-y-1 active:scale-95",
-                userReaction === key && "bg-primary/10 scale-110 ring-1.5 ring-primary/20"
-              )}
-              style={{ animation: `scale-in 0.18s ease-out ${i * 25}ms both` }}
-            >
-              <span>{emoji}</span>
-              <span className="text-[8px] sm:hidden text-muted-foreground mt-0.5 leading-none">
-                {REACTION_LABELS[key]}
-              </span>
-            </button>
-          ))}
+          {Object.entries(REACTION_EMOJIS).map(([key, emoji], i) => {
+            const colors = REACTION_COLORS[key];
+            const isActive = userReaction === key;
+            return (
+              <button
+                key={key}
+                onClick={(e) => handleSelect(key as ReactionKey, e)}
+                className={cn(
+                  "w-[44px] h-[44px] sm:w-[36px] sm:h-[36px] flex flex-col items-center justify-center rounded-full text-[22px] sm:text-[19px] transition-all duration-150",
+                  "hover:scale-[1.25] hover:-translate-y-1 active:scale-95",
+                )}
+                style={{
+                  animation: `scale-in 0.18s ease-out ${i * 30}ms both`,
+                  backgroundColor: isActive ? colors?.bg : undefined,
+                  boxShadow: isActive ? `0 0 0 1.5px ${colors?.ring}` : undefined,
+                }}
+              >
+                <span>{emoji}</span>
+                <span className="text-[8px] sm:hidden mt-0.5 leading-none" style={{ color: colors?.text }}>
+                  {REACTION_LABELS[key]}
+                </span>
+              </button>
+            );
+          })}
         </div>
       )}
 
