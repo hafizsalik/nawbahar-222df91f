@@ -22,6 +22,7 @@ export type Database = {
           ai_score_timing: number | null
           ai_score_writing: number | null
           author_id: string
+          comment_count: number
           content: string
           cover_image_url: string | null
           created_at: string
@@ -35,6 +36,7 @@ export type Database = {
           final_weight: number | null
           id: string
           parent_article_id: string | null
+          reaction_count: number
           read_count: number | null
           save_count: number | null
           scheduled_at: string | null
@@ -53,6 +55,7 @@ export type Database = {
           ai_score_timing?: number | null
           ai_score_writing?: number | null
           author_id: string
+          comment_count?: number
           content: string
           cover_image_url?: string | null
           created_at?: string
@@ -66,6 +69,7 @@ export type Database = {
           final_weight?: number | null
           id?: string
           parent_article_id?: string | null
+          reaction_count?: number
           read_count?: number | null
           save_count?: number | null
           scheduled_at?: string | null
@@ -84,6 +88,7 @@ export type Database = {
           ai_score_timing?: number | null
           ai_score_writing?: number | null
           author_id?: string
+          comment_count?: number
           content?: string
           cover_image_url?: string | null
           created_at?: string
@@ -97,6 +102,7 @@ export type Database = {
           final_weight?: number | null
           id?: string
           parent_article_id?: string | null
+          reaction_count?: number
           read_count?: number | null
           save_count?: number | null
           scheduled_at?: string | null
