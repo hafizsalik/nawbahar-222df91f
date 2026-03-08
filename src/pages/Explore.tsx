@@ -8,6 +8,7 @@ import { usePublishedArticles } from "@/hooks/useArticles";
 import { cn, toPersianNumber } from "@/lib/utils";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { SEOHead } from "@/components/SEOHead";
 
 const topics = [
   { id: "politics", label: "سیاست", emoji: "🏛️" },
@@ -99,6 +100,11 @@ const Explore = () => {
 
   return (
     <AppLayout>
+      <SEOHead
+        title="کاوش"
+        description="جستجو و کاوش مقالات تخصصی نوبهار. موضوعات سیاست، فرهنگ، علم، جامعه، اقتصاد و سلامت."
+        ogUrl="/explore"
+      />
       <div className="animate-fade-in">
         {/* Search */}
         <div className="px-5 pt-4 pb-3">

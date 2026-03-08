@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { cn, toPersianNumber } from "@/lib/utils";
 import { getRelativeTime } from "@/lib/relativeTime";
 import { useState } from "react";
+import { SEOHead } from "@/components/SEOHead";
 
 function getNotificationIcon(type: string) {
   switch (type) {
@@ -79,6 +80,7 @@ const Notifications = () => {
   if (!user) {
     return (
       <AppLayout>
+        <SEOHead title="اعلانات" description="اعلانات نوبهار" ogUrl="/notifications" noIndex />
         <div className="flex flex-col items-center justify-center py-20 px-4 text-center animate-fade-in">
           <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-5">
             <Bell size={28} className="text-muted-foreground/40" />
@@ -97,6 +99,7 @@ const Notifications = () => {
 
   return (
     <AppLayout>
+      <SEOHead title="اعلانات" description="اعلانات نوبهار" ogUrl="/notifications" noIndex />
       <div className="min-h-screen animate-fade-in">
         {/* Header */}
         <div className="sticky top-11 z-30 bg-background border-b border-border px-5 py-3 flex items-center justify-between">
