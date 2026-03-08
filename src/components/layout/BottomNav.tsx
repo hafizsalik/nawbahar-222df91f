@@ -41,8 +41,7 @@ export function BottomNav() {
           <NavItem to="/" active={isActive("/")} label="خانه">
             <Home
               size={21}
-              strokeWidth={isActive("/") ? 2.2 : 1.4}
-              fill={isActive("/") ? "currentColor" : "none"}
+              strokeWidth={isActive("/") ? 1.8 : 1.4}
             />
           </NavItem>
 
