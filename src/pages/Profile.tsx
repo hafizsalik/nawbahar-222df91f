@@ -165,7 +165,7 @@ const Profile = () => {
             {/* Stats row */}
             <div className="flex items-center gap-6 mt-5">
               <div className="text-center">
-                <span className="block text-[17px] font-bold text-foreground">{articles.length}</span>
+                <span className="block text-[17px] font-bold text-foreground">{toPersianNumber(articles.length)}</span>
                 <span className="text-[11px] text-muted-foreground">مقاله</span>
               </div>
               <button 
