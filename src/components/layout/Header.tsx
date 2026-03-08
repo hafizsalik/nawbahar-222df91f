@@ -174,6 +174,14 @@ export function Header() {
                   نصب اپلیکیشن
                 </button>
 
+                <button
+                  onClick={() => { setMenuOpen(false); navigate("/contact"); }}
+                  className="w-full px-3 py-2 flex items-center gap-2 text-[11.5px] text-foreground hover:bg-muted/40 transition-colors border-b border-border/30"
+                >
+                  <MessageSquare size={14} strokeWidth={1.5} className="text-muted-foreground" />
+                  ارتباط با ما
+                </button>
+
                 {user && (
                   <button
                     onClick={handleSignOut}
