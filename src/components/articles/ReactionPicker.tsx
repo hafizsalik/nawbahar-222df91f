@@ -7,28 +7,16 @@ interface ReactionPickerProps {
   userReaction: ReactionKey | null;
   onReact: (type: ReactionKey) => void;
   onHover?: () => void;
-  /** Emoji types to show as small badges after the icon */
-  summaryEmojis?: ReactionKey[];
-  /** Text to show after emojis (e.g. "شما، احمد و ۵ نفر دیگر") */
   summaryText?: string;
-  /** Click handler for the summary text (opens details modal) */
   onSummaryClick?: (e: React.MouseEvent) => void;
 }
 
-export function ReactionPicker({
-  userReaction,
-  onReact,
-  onHover,
-  summaryEmojis = [],
-  summaryText,
-  onSummaryClick,
-}: ReactionPickerProps) {
+export function ReactionPicker({ userReaction, onReact, onHover, summaryText, onSummaryClick }: ReactionPickerProps) {
   const [open, setOpen] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const longPressRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Close on scroll
   useEffect(() => {
     if (!open) return;
     const close = () => setOpen(false);
@@ -44,7 +32,7 @@ export function ReactionPicker({
 
   const handlePointerLeave = () => {
     clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => setOpen(false), 250);
+    timeoutRef.current = setTimeout(() => setOpen(false), 220);
   };
 
   const handleTap = (e: React.MouseEvent) => {
@@ -70,9 +58,7 @@ export function ReactionPicker({
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     e.stopPropagation();
-    if (!longPressRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+    if (!longPressRef.current) clearTimeout(timeoutRef.current);
   };
 
   const handleSelect = (type: ReactionKey, e: React.MouseEvent) => {
@@ -85,12 +71,14 @@ export function ReactionPicker({
   const handleTextClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onSummaryClick?.(e);
+    if (onSummaryClick) {
+      onSummaryClick(e);
+      return;
+    }
+    onReact("like");
   };
 
-  useEffect(() => {
-    return () => clearTimeout(timeoutRef.current);
-  }, []);
+  useEffect(() => () => clearTimeout(timeoutRef.current), []);
 
   useEffect(() => {
     if (!open) return;
@@ -103,7 +91,8 @@ export function ReactionPicker({
     return () => document.removeEventListener("pointerdown", handler);
   }, [open]);
 
-  const hasReactions = summaryEmojis.length > 0;
+  const isLiked = userReaction === "like";
+  const isReacted = Boolean(userReaction);
 
   return (
     <div
@@ -112,53 +101,34 @@ export function ReactionPicker({
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
     >
-      {/* The reaction icon button (tap = like, long-press = picker) */}
       <button
         onClick={handleTap}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         className={cn(
-          "flex items-center transition-all duration-200",
-          userReaction
-            ? "text-foreground"
-            : "text-muted-foreground hover:text-foreground"
+          "flex items-center transition-colors duration-200",
+          isReacted ? "text-foreground" : "text-muted-foreground hover:text-foreground"
         )}
       >
-        {userReaction ? (
-          <span className="text-[14px] leading-none">{REACTION_EMOJIS[userReaction]}</span>
-        ) : (
-          <ThumbsUp size={14} strokeWidth={1.5} />
-        )}
+        <ThumbsUp
+          size={14}
+          strokeWidth={1.5}
+          fill={isLiked ? "currentColor" : "none"}
+        />
       </button>
 
-      {/* Summary: emoji badges + text */}
       {summaryText && (
         <button
-          onClick={onSummaryClick ? handleTextClick : handleTap}
-          className="flex items-center gap-1 min-w-0 hover:opacity-75 transition-opacity"
-        >
-          {hasReactions && (
-            <div className="flex items-center -space-x-1 flex-shrink-0">
-              {summaryEmojis.map((type) => (
-                <span
-                  key={type}
-                  className="w-[15px] h-[15px] flex items-center justify-center rounded-full text-[9.5px] leading-none border-[1.5px] border-background"
-                  style={{ background: "hsl(var(--muted))" }}
-                  role="img"
-                  aria-label={type}
-                >
-                  {REACTION_EMOJIS[type]}
-                </span>
-              ))}
-            </div>
+          onClick={handleTextClick}
+          className={cn(
+            "text-[11px] truncate max-w-[150px] transition-colors duration-200",
+            isReacted ? "text-foreground/85" : "text-muted-foreground"
           )}
-          <span className="text-[11px] text-muted-foreground/60 truncate max-w-[150px]">
-            {summaryText}
-          </span>
+        >
+          {summaryText}
         </button>
       )}
 
-      {/* Emoji picker tray */}
       {open && (
         <div
           className="absolute bottom-full mb-2 left-0 flex items-center gap-0.5 rounded-full px-2 py-1.5 z-50 animate-scale-in"
@@ -174,11 +144,9 @@ export function ReactionPicker({
               className={cn(
                 "w-[32px] h-[32px] flex items-center justify-center rounded-full text-[18px] transition-all duration-150",
                 "hover:scale-[1.35] hover:-translate-y-1",
-                userReaction === key && "bg-muted scale-110"
+                userReaction === key && "bg-muted/70 scale-110"
               )}
-              style={{
-                animation: `scale-in 0.18s ease-out ${i * 25}ms both`,
-              }}
+              style={{ animation: `scale-in 0.18s ease-out ${i * 25}ms both` }}
               title={REACTION_LABELS[key]}
             >
               {emoji}

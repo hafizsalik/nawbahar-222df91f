@@ -2,7 +2,7 @@ import { MessageCircle, CheckCheck } from "lucide-react";
 import { cn, toPersianNumber } from "@/lib/utils";
 import { ReactionPicker } from "./ReactionPicker";
 import { ReactionDetailsModal } from "./ReactionDetailsModal";
-import { REACTION_EMOJIS, type ReactionKey, type ReactionSummary } from "@/hooks/useCardReactions";
+import { type ReactionKey, type ReactionSummary } from "@/hooks/useCardReactions";
 import { useState } from "react";
 
 interface ArticleCardMetricsProps {
@@ -31,13 +31,10 @@ export function ArticleCardMetrics({
   onReact,
   onReactionHover,
 }: ArticleCardMetricsProps) {
-  const { topTypes, totalCount, reactorNames, userReaction } = reactionSummary;
+  const { totalCount, reactorNames, userReaction } = reactionSummary;
   const [showReactionDetails, setShowReactionDetails] = useState(false);
 
   const displayCount = totalCount > 0 ? totalCount : reactionCount;
-  const displayTopTypes: ReactionKey[] = topTypes.length > 0
-    ? topTypes.slice(0, 2)
-    : (reactionCount > 0 ? ["like"] : []);
 
   const buildReactionLabel = (): string => {
     if (displayCount === 0) return "پسند";
@@ -48,14 +45,15 @@ export function ArticleCardMetrics({
 
     const names: string[] = [];
     if (userReaction) names.push("شما");
-    reactorNames.forEach((n) => { if (!names.includes(n)) names.push(n); });
+    reactorNames.forEach((n) => {
+      if (!names.includes(n)) names.push(n);
+    });
 
-    if (names.length === 0 && displayCount > 0) {
-      return `${toPersianNumber(displayCount)} نفر`;
-    }
+    if (names.length === 0) return `${toPersianNumber(displayCount)} نفر`;
 
     const shown = names.slice(0, 2);
     const remaining = Math.max(displayCount - shown.length, 0);
+
     let text = shown.join("، ");
     if (remaining > 0) text += ` و ${toPersianNumber(remaining)} نفر دیگر`;
     return text;
@@ -78,7 +76,6 @@ export function ArticleCardMetrics({
       <div className="mt-3 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            {/* Comment button */}
             <button
               onClick={onCommentClick}
               className={cn(
@@ -92,20 +89,16 @@ export function ArticleCardMetrics({
               </span>
             </button>
 
-            {/* Single reaction button: icon + emojis + text all together */}
             <ReactionPicker
               userReaction={userReaction}
               onReact={onReact}
               onHover={onReactionHover}
-              summaryEmojis={hasReactions ? displayTopTypes : []}
               summaryText={reactionText}
               onSummaryClick={hasReactions ? handleSummaryClick : undefined}
             />
           </div>
 
-          {isRead && (
-            <CheckCheck size={12} strokeWidth={2} className="text-primary/35" />
-          )}
+          {isRead && <CheckCheck size={12} strokeWidth={2} className="text-primary/35" />}
         </div>
       </div>
 
