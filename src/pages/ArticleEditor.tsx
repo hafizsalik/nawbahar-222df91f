@@ -583,19 +583,94 @@ const ArticleEditor = () => {
           <button onClick={() => insertFormat("\n> ", "")} className="p-1.5 text-muted-foreground/50 hover:text-foreground rounded-md transition-colors" title="نقل قول">
             <Quote size={16} strokeWidth={1.5} />
           </button>
+          <div className="w-px h-4 bg-border/30 mx-1" />
+          <button
+            onClick={proofActive ? () => { setProofActive(false); setProofIssues([]); setSelectedIssue(null); } : handleProofread}
+            disabled={proofLoading}
+            className={`p-1.5 rounded-md transition-colors flex items-center gap-1 ${
+              proofActive ? "text-primary bg-primary/10" : "text-muted-foreground/50 hover:text-foreground"
+            }`}
+            title="ویراستاری هوشمند"
+          >
+            {proofLoading ? <Loader2 size={16} className="animate-spin" /> : <SpellCheck size={16} strokeWidth={1.5} />}
+          </button>
           <div className="flex-1" />
+          {proofActive && proofIssues.length > 0 && (
+            <span className="text-[10px] text-destructive/70 ml-2">{toPersianNumber(proofIssues.length)} مورد</span>
+          )}
           <span className="text-[10px] text-muted-foreground/30">{toPersianNumber(wordCount)} کلمه</span>
         </div>
 
-        {/* Content */}
-        <Textarea
-          ref={textareaRef}
-          placeholder="متن مقاله خود را بنویسید..."
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="min-h-[45vh] border-0 resize-none px-0 focus-visible:ring-0 bg-transparent text-[15px] placeholder:text-muted-foreground/25"
-          style={{ lineHeight: '2.2' }}
-        />
+        {/* Content area */}
+        <div className="relative">
+          <Textarea
+            ref={textareaRef}
+            placeholder="متن مقاله خود را بنویسید..."
+            value={content}
+            onChange={(e) => { setContent(e.target.value); if (proofActive) { setProofActive(false); setProofIssues([]); } }}
+            className={`min-h-[45vh] border-0 resize-none px-0 focus-visible:ring-0 bg-transparent text-[15px] placeholder:text-muted-foreground/25 ${proofActive && proofIssues.length > 0 ? "opacity-0 absolute inset-0" : ""}`}
+            style={{ lineHeight: '2.2' }}
+          />
+
+          {/* Proofreading overlay */}
+          {proofActive && proofIssues.length > 0 && (() => {
+            const parts = getHighlightedContent();
+            if (!parts) return null;
+            return (
+              <div
+                className="min-h-[45vh] text-[15px] text-foreground whitespace-pre-wrap cursor-text"
+                style={{ lineHeight: '2.2' }}
+                onClick={() => textareaRef.current?.focus()}
+              >
+                {parts.map((part, i) => 
+                  part.issue ? (
+                    <span
+                      key={i}
+                      onClick={(e) => { e.stopPropagation(); setSelectedIssue(selectedIssue?.word === part.issue!.word ? null : part.issue!); }}
+                      className={`relative cursor-pointer border-b-2 transition-colors ${
+                        part.issue.type === "spelling" ? "border-destructive/60 bg-destructive/8" :
+                        part.issue.type === "grammar" ? "border-yellow-500/60 bg-yellow-500/8" :
+                        "border-blue-500/60 bg-blue-500/8"
+                      } ${selectedIssue?.word === part.issue.word ? "ring-2 ring-primary/30 rounded-sm" : ""}`}
+                    >
+                      {part.text}
+                      {/* Tooltip */}
+                      {selectedIssue?.word === part.issue.word && (
+                        <span className="absolute bottom-full right-0 mb-1 z-10 w-56 p-2.5 bg-popover border border-border rounded-lg shadow-lg text-right animate-fade-in" onClick={(e) => e.stopPropagation()}>
+                          <span className="flex items-center gap-1.5 mb-1.5">
+                            <span className={`w-1.5 h-1.5 rounded-full ${
+                              part.issue!.type === "spelling" ? "bg-destructive" :
+                              part.issue!.type === "grammar" ? "bg-yellow-500" : "bg-blue-500"
+                            }`} />
+                            <span className="text-[10px] text-muted-foreground">
+                              {part.issue!.type === "spelling" ? "املایی" : part.issue!.type === "grammar" ? "دستوری" : "سبکی"}
+                            </span>
+                          </span>
+                          <span className="block text-[11px] text-muted-foreground leading-relaxed mb-2">{part.issue!.reason}</span>
+                          <span className="flex gap-1.5">
+                            <button
+                              onClick={() => applyProofFix(part.issue!)}
+                              className="flex-1 text-[11px] px-2 py-1 bg-primary/10 text-primary rounded-md hover:bg-primary/20 transition-colors"
+                            >
+                              ← {part.issue!.suggestion}
+                            </button>
+                            <button
+                              onClick={() => dismissProofIssue(part.issue!)}
+                              className="text-[11px] px-2 py-1 text-muted-foreground rounded-md hover:bg-muted transition-colors"
+                            >
+                              رد
+                            </button>
+                          </span>
+                        </span>
+                      )}
+                    </span>
+                  ) : (
+                    <span key={i}>{part.text}</span>
+                  )
+                )}
+              </div>
+            );
+          })()}
 
         {/* Extras Toggle */}
         <button
