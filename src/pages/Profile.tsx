@@ -31,7 +31,7 @@ const Profile = () => {
   
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
-  const [showFollowing, setShowFollowing] = useState(false);
+  
 
   // Not logged in
   if (!user && isOwnProfile) {
