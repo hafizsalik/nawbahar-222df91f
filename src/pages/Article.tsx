@@ -132,9 +132,38 @@ const Article = () => {
   if (!article) return null;
 
   const readTime = Math.max(1, Math.ceil(article.content.split(/\s+/).length / 200));
+  const articleDescription = article.content.replace(/\s+/g, " ").slice(0, 155).trim() + "…";
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title={article.title}
+        description={articleDescription}
+        ogUrl={`/article/${article.id}`}
+        ogType="article"
+        ogImage={article.cover_image_url || undefined}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: article.title,
+          description: articleDescription,
+          image: article.cover_image_url || undefined,
+          datePublished: article.created_at,
+          author: {
+            "@type": "Person",
+            name: article.author?.display_name,
+          },
+          publisher: {
+            "@type": "Organization",
+            name: "نوبهار",
+            url: "https://nawbahar.lovable.app",
+          },
+          mainEntityOfPage: `https://nawbahar.lovable.app/article/${article.id}`,
+          inLanguage: "fa-IR",
+          wordCount: article.content.split(/\s+/).length,
+          keywords: article.tags?.join(", "),
+        }}
+      />
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background border-b border-border">
         <div className="flex items-center justify-between px-4 h-11 max-w-screen-md mx-auto">
