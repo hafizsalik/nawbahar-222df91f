@@ -84,7 +84,7 @@ export function ArticleCardMetrics({
                 commentsOpen ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <MessageCircle size={14} strokeWidth={1.5} />
+              <MessageCircle size={14} strokeWidth={1.5} aria-hidden="true" />
               <span className="text-[11.5px]">
                 {commentCount > 0 ? `${toPersianNumber(commentCount)} نظر` : "نظر"}
               </span>
