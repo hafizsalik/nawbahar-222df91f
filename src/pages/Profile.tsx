@@ -358,7 +358,7 @@ const Profile = () => {
                         style={{ width: `${profile.trust_score}%` }}
                       />
                     </div>
-                    <span className="text-[13px] font-semibold text-primary">{profile.trust_score}</span>
+                    <span className="text-[13px] font-semibold text-primary">{toPersianNumber(profile.trust_score)}</span>
                   </div>
                 </div>
               )}
