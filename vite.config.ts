@@ -121,6 +121,9 @@ export default defineConfig(({ mode }) => ({
         launch_handler: {
           client_mode: ["navigate-existing", "auto"],
         },
+        scope_extensions: [
+          { origin: "https://nawbahar.lovable.app" },
+        ],
         edge_side_panel: {
           preferred_width: 400,
         },
