@@ -320,10 +320,14 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
             <div className="border-t border-border pt-6 space-y-5">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-lg">امتیازدهی ویرایشگر</h3>
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
-                  <Bot size={12} />
-                  <span>پیش‌ارزیابی هوش مصنوعی</span>
-                </div>
+                <button
+                  onClick={runAIScoring}
+                  disabled={aiLoading}
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted hover:bg-primary/10 hover:text-primary px-2.5 py-1 rounded-full transition-colors"
+                >
+                  <Bot size={12} className={aiLoading ? "animate-spin" : ""} />
+                  <span>{aiLoading ? "در حال ارزیابی..." : "ارزیابی با هوش مصنوعی"}</span>
+                </button>
               </div>
 
               {scoreLabels.map(({ key, label, icon: Icon, max, color }) => {
