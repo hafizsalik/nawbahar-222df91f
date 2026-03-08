@@ -298,6 +298,11 @@ const Profile = () => {
                 </div>
               )}
             </div>
+
+            {/* Profile Reviews */}
+            {viewingUserId && (
+              <ProfileReviews profileId={viewingUserId} isOwnProfile={isOwnProfile} />
+            )}
           </TabsContent>
         </Tabs>
 
