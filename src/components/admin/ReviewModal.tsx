@@ -18,6 +18,11 @@ interface AdminArticle {
   created_at: string;
   total_feed_rank: number | null;
   view_count?: number | null;
+  ai_score_science?: number | null;
+  ai_score_ethics?: number | null;
+  ai_score_writing?: number | null;
+  ai_score_timing?: number | null;
+  ai_score_innovation?: number | null;
   editorial_score_science: number | null;
   editorial_score_ethics: number | null;
   editorial_score_writing: number | null;
@@ -40,21 +45,16 @@ const scoreLabels = [
   { key: "innovation", label: "نوآوری", icon: Lightbulb, max: 5, color: "text-rose-500" },
 ];
 
-// AI pre-review scoring based on content analysis
-function generateAIScores(content: string, title: string) {
+// Fallback local AI scores (used if edge function hasn't run yet)
+function fallbackAIScores(content: string, title: string) {
   const wordCount = content.split(/\s+/).length;
   const hasScientificTerms = /علم|تحقیق|مطالعه|پژوهش|بررسی|آمار|داده|نتیجه|روش/i.test(content);
-  const hasEthicalTerms = /اخلاق|ارزش|احترام|مسئولیت|انصاف|عدالت/i.test(content);
-  const hasReferences = /منبع|مرجع|کتاب|مقاله|نقل/i.test(content);
   const hasParagraphs = (content.match(/\n\n/g) || []).length >= 3;
-  const hasProperTitle = title.length >= 10 && title.length <= 100;
-  
-  const science = Math.min(15, (hasScientificTerms ? 10 : 6) + (hasReferences ? 3 : 0) + Math.floor(Math.random() * 3));
-  const ethics = Math.min(10, (hasEthicalTerms ? 7 : 5) + Math.floor(Math.random() * 2));
-  const writing = Math.min(10, (hasParagraphs ? 6 : 4) + (wordCount > 300 ? 2 : 0) + Math.floor(Math.random() * 2));
-  const timing = Math.min(10, 5 + Math.floor(Math.random() * 3));
-  const innovation = Math.min(5, (hasProperTitle && content.length > 1000 ? 3 : 2) + Math.floor(Math.random() * 2));
-  
+  const science = Math.min(15, (hasScientificTerms ? 8 : 5));
+  const ethics = Math.min(10, 5);
+  const writing = Math.min(10, (hasParagraphs ? 6 : 4) + (wordCount > 300 ? 2 : 0));
+  const timing = Math.min(10, 5);
+  const innovation = Math.min(5, title.length > 10 ? 3 : 2);
   return { science, ethics, writing, timing, innovation };
 }
 
@@ -62,9 +62,17 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
   const [rejectReason, setRejectReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
   const { toast } = useToast();
 
-  const aiScores = generateAIScores(article.content, article.title);
+  // Use stored AI scores if available, otherwise use fallback
+  const aiScores = {
+    science: article.ai_score_science ?? fallbackAIScores(article.content, article.title).science,
+    ethics: article.ai_score_ethics ?? fallbackAIScores(article.content, article.title).ethics,
+    writing: article.ai_score_writing ?? fallbackAIScores(article.content, article.title).writing,
+    timing: article.ai_score_timing ?? fallbackAIScores(article.content, article.title).timing,
+    innovation: article.ai_score_innovation ?? fallbackAIScores(article.content, article.title).innovation,
+  };
 
   const [scores, setScores] = useState({
     science: article.editorial_score_science ?? aiScores.science,
@@ -75,14 +83,41 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
   });
 
   const [activeSlider, setActiveSlider] = useState<string | null>(null);
-  const totalScore = Object.values(scores).reduce((sum, v) => sum + v, 0);
+  const totalScore = Object.values(scores).reduce((sum: number, v: number) => sum + v, 0);
   const maxPossibleScore = 50;
   const scorePercent = Math.round((totalScore / maxPossibleScore) * 100);
+
+  // Trigger real AI scoring
+  const runAIScoring = async () => {
+    setAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-score-article", {
+        body: { title: article.title, content: article.content, articleId: article.id },
+      });
+      if (error) throw error;
+      if (data?.scores) {
+        const s = data.scores;
+        setScores({
+          science: s.science,
+          ethics: s.ethics,
+          writing: s.writing,
+          timing: s.timing,
+          innovation: s.innovation,
+        });
+        toast({ title: "✅ ارزیابی هوش مصنوعی انجام شد" });
+      }
+    } catch (e) {
+      console.error("AI scoring error:", e);
+      toast({ title: "خطا در ارزیابی هوش مصنوعی", variant: "destructive" });
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const handleApprove = async () => {
     setLoading(true);
     
-    const aiTotal = Object.values(aiScores).reduce((sum, v) => sum + v, 0);
+    const aiTotal = Object.values(aiScores).reduce((sum: number, v: number) => sum + v, 0);
     const editorTotal = totalScore;
     const authorTrust = 50;
     const engagement = 0;
@@ -285,10 +320,14 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
             <div className="border-t border-border pt-6 space-y-5">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-lg">امتیازدهی ویرایشگر</h3>
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
-                  <Bot size={12} />
-                  <span>پیش‌ارزیابی هوش مصنوعی</span>
-                </div>
+                <button
+                  onClick={runAIScoring}
+                  disabled={aiLoading}
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted hover:bg-primary/10 hover:text-primary px-2.5 py-1 rounded-full transition-colors"
+                >
+                  <Bot size={12} className={aiLoading ? "animate-spin" : ""} />
+                  <span>{aiLoading ? "در حال ارزیابی..." : "ارزیابی با هوش مصنوعی"}</span>
+                </button>
               </div>
 
               {scoreLabels.map(({ key, label, icon: Icon, max, color }) => {
