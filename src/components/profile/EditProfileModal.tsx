@@ -45,6 +45,7 @@ export function EditProfileModal({
   const [loading, setLoading] = useState(false);
   const [displayName, setDisplayName] = useState(currentDisplayName);
   const [specialty, setSpecialty] = useState(currentSpecialty || "");
+  const [bio, setBio] = useState(currentBio || "");
   const [whatsapp, setWhatsapp] = useState(currentWhatsapp || "");
   const [facebook, setFacebook] = useState(currentFacebook || "");
   const [linkedin, setLinkedin] = useState(currentLinkedin || "");
