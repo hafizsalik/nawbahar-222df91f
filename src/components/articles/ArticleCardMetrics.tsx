@@ -92,12 +92,6 @@ export function ArticleCardMetrics({
             <Bookmark size={14} strokeWidth={1.8} />
           </button>
 
-          <button
-            onClick={stop}
-            className="text-foreground/40 hover:text-foreground/65 transition-colors"
-          >
-            <MoreHorizontal size={14} strokeWidth={1.8} />
-          </button>
         </div>
       </div>
     </div>
