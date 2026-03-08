@@ -14,7 +14,7 @@ import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { getRelativeTime } from "@/lib/relativeTime";
 import { FollowersList } from "@/components/profile/FollowersList";
 import { FollowButton } from "@/components/FollowButton";
-import { cn } from "@/lib/utils";
+import { cn, toPersianNumber } from "@/lib/utils";
 
 const Profile = () => {
   const { userId: paramUserId } = useParams();
@@ -165,21 +165,21 @@ const Profile = () => {
             {/* Stats row */}
             <div className="flex items-center gap-6 mt-5">
               <div className="text-center">
-                <span className="block text-[17px] font-bold text-foreground">{articles.length}</span>
+                <span className="block text-[17px] font-bold text-foreground">{toPersianNumber(articles.length)}</span>
                 <span className="text-[11px] text-muted-foreground">مقاله</span>
               </div>
               <button 
                 onClick={() => setShowFollowers(true)}
                 className="text-center hover:opacity-70 transition-opacity"
               >
-                <span className="block text-[17px] font-bold text-foreground">{followerCount}</span>
+                <span className="block text-[17px] font-bold text-foreground">{toPersianNumber(followerCount)}</span>
                 <span className="text-[11px] text-muted-foreground">دنبال‌کننده</span>
               </button>
               <button 
                 onClick={() => setShowFollowing(true)}
                 className="text-center hover:opacity-70 transition-opacity"
               >
-                <span className="block text-[17px] font-bold text-foreground">{followingCount}</span>
+                <span className="block text-[17px] font-bold text-foreground">{toPersianNumber(followingCount)}</span>
                 <span className="text-[11px] text-muted-foreground">دنبال‌شده</span>
               </button>
             </div>

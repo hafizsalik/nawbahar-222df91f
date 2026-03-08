@@ -19,6 +19,7 @@ import { ResponseArticles } from "@/components/articles/ResponseArticles";
 import { Button } from "@/components/ui/button";
 import { FollowButton } from "@/components/FollowButton";
 import { useToast } from "@/hooks/use-toast";
+import { toPersianNumber } from "@/lib/utils";
 
 interface ArticleData {
   id: string;
@@ -186,7 +187,7 @@ const Article = () => {
               <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
                 <span>{formatSolarShort(article.created_at)}</span>
                 <span className="text-muted-foreground/40">·</span>
-                <span>{readTime} دقیقه مطالعه</span>
+                <span>{toPersianNumber(readTime)} دقیقه مطالعه</span>
               </div>
             </div>
           </div>
