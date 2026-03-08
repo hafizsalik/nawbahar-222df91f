@@ -224,7 +224,6 @@ export function EditProfileModal({
             />
             <p className="text-[10px] text-muted-foreground text-left" dir="ltr">{bio.length}/500</p>
           </div>
-          </div>
 
           {/* Social Links */}
           <div className="pt-2 border-t border-border">
