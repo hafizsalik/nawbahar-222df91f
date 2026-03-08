@@ -87,11 +87,11 @@ export function ArticleCardMetrics({
                 onClick={handleReactionSummaryClick}
                 className="flex items-center gap-1 hover:opacity-80 transition-opacity"
               >
-                <div className="flex items-center -space-x-1">
+                <div className="flex items-center gap-px">
                   {topTypes.slice(0, 2).map((type) => (
                     <span
                       key={type}
-                      className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-muted/60 text-sm leading-none ring-1 ring-background"
+                      className="text-base leading-none"
                       role="img"
                       aria-label={type}
                     >
