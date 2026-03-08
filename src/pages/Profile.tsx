@@ -172,7 +172,7 @@ const Profile = () => {
                 onClick={() => setShowFollowers(true)}
                 className="text-center hover:opacity-70 transition-opacity"
               >
-                <span className="block text-[17px] font-bold text-foreground">{followerCount}</span>
+                <span className="block text-[17px] font-bold text-foreground">{toPersianNumber(followerCount)}</span>
                 <span className="text-[11px] text-muted-foreground">دنبال‌کننده</span>
               </button>
               <button 
