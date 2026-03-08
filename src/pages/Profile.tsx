@@ -406,8 +406,8 @@ const Profile = () => {
 
 function EmptyState({ emoji, text }: { emoji: string; text: string }) {
   return (
-    <div className="text-center py-20 text-muted-foreground text-[13px]">
-      <div className="text-2xl mb-3">{emoji}</div>
+    <div className="text-center py-14 text-muted-foreground text-[12px]">
+      <div className="text-xl mb-2">{emoji}</div>
       {text}
     </div>
   );
