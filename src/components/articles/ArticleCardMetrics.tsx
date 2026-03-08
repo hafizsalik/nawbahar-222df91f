@@ -66,7 +66,7 @@ export function ArticleCardMetrics({
     <div className="mt-3 pb-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          {/* Comment button with summary */}
+          {/* Comment button with count or label */}
           <button
             onClick={onCommentClick}
             className={cn(
@@ -77,18 +77,10 @@ export function ArticleCardMetrics({
             )}
           >
             <MessageCircle size={14} strokeWidth={1.5} />
-            {commentCount > 0 && <span className="text-[11.5px]">{commentCount}</span>}
+            <span className="text-[11.5px]">
+              {commentCount > 0 ? `${commentCount} نظر` : "نظر"}
+            </span>
           </button>
-
-          {/* Comment summary text */}
-          {commentText && (
-            <button
-              onClick={onCommentClick}
-              className="text-[10.5px] text-muted-foreground/45 truncate max-w-[100px] hover:text-muted-foreground transition-colors"
-            >
-              {commentText}
-            </button>
-          )}
 
           {/* Response articles indicator */}
           {responseCount > 0 && (
