@@ -1,4 +1,4 @@
-import { Eye, MessageCircle, Reply, CheckCheck, Bookmark } from "lucide-react";
+import { Eye, MessageCircle, Reply, CheckCheck, Bookmark, ThumbsDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ArticleCardMetricsProps {
@@ -20,17 +20,22 @@ export function ArticleCardMetrics({
   onCommentClick,
   onResponseClick,
 }: ArticleCardMetricsProps) {
+  const stopPropagation = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   return (
     <div className="flex items-center justify-between mt-3">
-      {/* Left: read indicator + tag-like info */}
+      {/* Left: read indicator */}
       <div className="flex items-center gap-1.5">
         {isRead && (
           <CheckCheck size={14} strokeWidth={2.2} className="text-primary/50" />
         )}
       </div>
 
-      {/* Right: Medium-style — bold rounded icons, darker, no borders */}
-      <div className="flex items-center gap-4">
+      {/* Right: full icon row */}
+      <div className="flex items-center gap-3.5">
         {viewCount > 0 && (
           <span className="flex items-center gap-1 text-[11px] text-foreground/35">
             <Eye size={16} strokeWidth={1.8} />
@@ -38,15 +43,13 @@ export function ArticleCardMetrics({
           </span>
         )}
 
-        {responseCount > 0 && (
-          <button
-            onClick={onResponseClick}
-            className="flex items-center gap-1 text-[11px] text-foreground/35 hover:text-foreground/60 transition-colors"
-          >
-            <Reply size={16} strokeWidth={1.8} />
-            <span>{responseCount}</span>
-          </button>
-        )}
+        <button
+          onClick={onResponseClick}
+          className="flex items-center gap-1 text-[11px] text-foreground/35 hover:text-foreground/60 transition-colors"
+        >
+          <Reply size={16} strokeWidth={1.8} />
+          {responseCount > 0 && <span>{responseCount}</span>}
+        </button>
 
         <button
           onClick={onCommentClick}
@@ -60,19 +63,23 @@ export function ArticleCardMetrics({
           <MessageCircle
             size={16}
             strokeWidth={1.8}
-            className={cn(
-              "transition-colors",
-              commentsOpen && "fill-primary/20"
-            )}
+            className={cn(commentsOpen && "fill-primary/20")}
           />
           {commentCount > 0 && <span>{commentCount}</span>}
         </button>
 
         <button
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+          onClick={stopPropagation}
           className="text-foreground/35 hover:text-foreground/60 transition-colors"
         >
-          <Bookmark size={16} strokeWidth={1.8} />
+          <ThumbsDown size={15} strokeWidth={1.8} />
+        </button>
+
+        <button
+          onClick={stopPropagation}
+          className="text-foreground/35 hover:text-foreground/60 transition-colors"
+        >
+          <Bookmark size={15} strokeWidth={1.8} />
         </button>
       </div>
     </div>
