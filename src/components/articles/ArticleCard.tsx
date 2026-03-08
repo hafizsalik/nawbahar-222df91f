@@ -151,20 +151,14 @@ export function ArticleCard({ article, onDelete: _onDelete }: ArticleCardProps) 
           </div>
         </div>
 
-        <div className="flex items-center mt-3.5">
-          {article.tags && article.tags.length > 0 && (
-            <span className="bg-secondary/50 text-muted-foreground/45 px-2.5 py-0.5 rounded-full text-[10px] font-medium">
-              {article.tags[0]}
-            </span>
-          )}
-        </div>
-
         <ArticleCardMetrics
           viewCount={viewCount}
           commentCount={comments.length}
           responseCount={responseCount}
           isRead={hasBeenRead}
           commentsOpen={showComments}
+          tag={article.tags?.[0] || null}
+          latestCommentSnippet={commentSnippet}
           onCommentClick={handleCommentClick}
           onResponseClick={handleResponseClick}
         />
