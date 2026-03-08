@@ -146,15 +146,12 @@ export function ArticleCard({ article, onDelete: _onDelete }: ArticleCardProps) 
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-3.5">
-          <div className="flex items-center gap-2 text-[11px] text-muted-foreground/35">
-            {article.tags && article.tags.length > 0 && (
-              <span className="bg-secondary/50 text-muted-foreground/45 px-2.5 py-0.5 rounded-full text-[10px] font-medium">
-                {article.tags[0]}
-              </span>
-            )}
-            <span>{calculateReadTime(article.content)}</span>
-          </div>
+        <div className="flex items-center mt-3.5">
+          {article.tags && article.tags.length > 0 && (
+            <span className="bg-secondary/50 text-muted-foreground/45 px-2.5 py-0.5 rounded-full text-[10px] font-medium">
+              {article.tags[0]}
+            </span>
+          )}
         </div>
 
         <ArticleCardMetrics
