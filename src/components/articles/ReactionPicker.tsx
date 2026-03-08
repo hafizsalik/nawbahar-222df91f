@@ -13,82 +13,18 @@ interface ReactionPickerProps {
 
 export function ReactionPicker({ userReaction, onReact, onHover, summaryText, onSummaryClick }: ReactionPickerProps) {
   const [open, setOpen] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
-  const longPressRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Close picker on outside scroll only
+  // Close on outside scroll
   useEffect(() => {
     if (!open) return;
     const close = (e: Event) => {
-      // Don't close if scrolling inside the picker itself
       if (containerRef.current?.contains(e.target as Node)) return;
       setOpen(false);
     };
     window.addEventListener("scroll", close, { passive: true, capture: true });
     return () => window.removeEventListener("scroll", close, true);
   }, [open]);
-
-  // Hover: only OPENS the picker tray, does NOT trigger any reaction
-  const handlePointerEnter = () => {
-    clearTimeout(timeoutRef.current);
-    onHover?.();
-    timeoutRef.current = setTimeout(() => setOpen(true), 400);
-  };
-
-  const handlePointerLeave = () => {
-    clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => setOpen(false), 250);
-  };
-
-  // Tap on the icon: toggle like (only if picker is NOT open)
-  const handleTap = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    // If picker is open or was long-pressed, don't toggle — let user pick from tray
-    if (open || longPressRef.current) {
-      longPressRef.current = false;
-      return;
-    }
-    onReact("like");
-  };
-
-  // Touch: long-press opens picker, short tap toggles like
-  const handleTouchStart = (e: React.TouchEvent) => {
-    e.stopPropagation();
-    longPressRef.current = false;
-    clearTimeout(timeoutRef.current);
-    onHover?.();
-    timeoutRef.current = setTimeout(() => {
-      longPressRef.current = true;
-      setOpen(true);
-    }, 400);
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    e.stopPropagation();
-    if (!longPressRef.current) clearTimeout(timeoutRef.current);
-  };
-
-  // Select from picker tray — this is the ONLY way to change reaction type
-  const handleSelect = (type: ReactionKey, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onReact(type);
-    setOpen(false);
-  };
-
-  const handleTextClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (onSummaryClick) {
-      onSummaryClick(e);
-      return;
-    }
-    onReact("like");
-  };
-
-  useEffect(() => () => clearTimeout(timeoutRef.current), []);
 
   // Close on outside click
   useEffect(() => {
@@ -102,20 +38,50 @@ export function ReactionPicker({ userReaction, onReact, onHover, summaryText, on
     return () => document.removeEventListener("pointerdown", handler);
   }, [open]);
 
+  // Like button: direct toggle
+  const handleLikeTap = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onReact("like");
+  };
+
+  // "واکنش" text click: open picker (or show details if has reactions)
+  const handleTextClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // If there are reactions and a summary click handler, show details
+    if (onSummaryClick) {
+      onSummaryClick(e);
+      return;
+    }
+    // Otherwise open the picker
+    onHover?.();
+    setOpen((prev) => !prev);
+  };
+
+  // "واکنش" label click when no reactions: open picker
+  const handleReactionLabelClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onHover?.();
+    setOpen((prev) => !prev);
+  };
+
+  // Select from picker tray
+  const handleSelect = (type: ReactionKey, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onReact(type);
+    setOpen(false);
+  };
+
   const isReacted = Boolean(userReaction);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative flex items-center gap-1.5"
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
-    >
-      {/* Reaction icon — tap toggles like, hover opens picker */}
+    <div ref={containerRef} className="relative flex items-center gap-1.5">
+      {/* Like icon — click directly toggles like */}
       <button
-        onClick={handleTap}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
+        onClick={handleLikeTap}
         className={cn(
           "flex items-center transition-colors duration-200",
           isReacted ? "text-foreground" : "text-muted-foreground hover:text-foreground"
@@ -128,8 +94,8 @@ export function ReactionPicker({ userReaction, onReact, onHover, summaryText, on
         />
       </button>
 
-      {/* Summary text: names / count */}
-      {summaryText && (
+      {/* Text area: either summary (clickable for details) or "واکنش" (clickable to open picker) */}
+      {summaryText && onSummaryClick ? (
         <button
           onClick={handleTextClick}
           className={cn(
@@ -139,15 +105,22 @@ export function ReactionPicker({ userReaction, onReact, onHover, summaryText, on
         >
           {summaryText}
         </button>
+      ) : (
+        <button
+          onClick={handleReactionLabelClick}
+          className="text-[11px] text-muted-foreground hover:text-foreground transition-colors duration-200"
+        >
+          واکنش
+        </button>
       )}
 
-      {/* Emoji picker tray */}
+      {/* Emoji picker tray — responsive, always fully visible */}
       {open && (
         <div
-          className="absolute bottom-full mb-2 left-0 flex items-center gap-0.5 rounded-full px-2 py-1.5 z-50 animate-scale-in"
+          className="fixed inset-x-0 bottom-0 sm:absolute sm:inset-auto sm:bottom-full sm:mb-2 sm:left-0 flex items-center justify-center gap-1 sm:gap-0.5 sm:rounded-full rounded-t-2xl px-3 sm:px-2 py-3 sm:py-1.5 z-50 animate-scale-in"
           style={{
             background: "hsl(var(--background))",
-            boxShadow: "0 4px 20px -4px hsl(var(--foreground) / 0.12), 0 0 0 1px hsl(var(--border) / 0.6)",
+            boxShadow: "0 -4px 20px -4px hsl(var(--foreground) / 0.12), 0 0 0 1px hsl(var(--border) / 0.6)",
           }}
         >
           {Object.entries(REACTION_EMOJIS).map(([key, emoji], i) => (
@@ -155,17 +128,31 @@ export function ReactionPicker({ userReaction, onReact, onHover, summaryText, on
               key={key}
               onClick={(e) => handleSelect(key as ReactionKey, e)}
               className={cn(
-                "w-[32px] h-[32px] flex items-center justify-center rounded-full text-[18px] transition-all duration-150",
-                "hover:scale-[1.35] hover:-translate-y-1",
+                "w-[40px] h-[40px] sm:w-[32px] sm:h-[32px] flex flex-col items-center justify-center rounded-full text-[22px] sm:text-[18px] transition-all duration-150",
+                "hover:scale-[1.25] hover:-translate-y-1 active:scale-95",
                 userReaction === key && "bg-muted/70 scale-110"
               )}
               style={{ animation: `scale-in 0.18s ease-out ${i * 25}ms both` }}
-              title={REACTION_LABELS[key]}
             >
-              {emoji}
+              <span>{emoji}</span>
+              <span className="text-[8px] sm:hidden text-muted-foreground mt-0.5 leading-none">
+                {REACTION_LABELS[key]}
+              </span>
             </button>
           ))}
         </div>
+      )}
+
+      {/* Backdrop for mobile */}
+      {open && (
+        <div
+          className="fixed inset-0 z-40 bg-background/40 backdrop-blur-sm sm:hidden"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen(false);
+          }}
+        />
       )}
     </div>
   );
