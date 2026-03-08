@@ -91,7 +91,7 @@ export function ArticleCardMetrics({
                   {topTypes.slice(0, 2).map((type) => (
                     <span
                       key={type}
-                      className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-muted/60 text-sm leading-none ring-1 ring-background"
+                      className="inline-flex items-center justify-center w-[18px] h-[18px] rounded-full text-[13px] leading-none"
                       role="img"
                       aria-label={type}
                     >
