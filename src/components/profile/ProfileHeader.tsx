@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, toPersianNumber } from "@/lib/utils";
 import { BadgeCheck, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
