@@ -7,6 +7,7 @@ interface ReactionPickerProps {
   userReaction: ReactionKey | null;
   onReact: (type: ReactionKey) => void;
   onHover?: () => void;
+  topTypes?: ReactionKey[];
   summaryText?: string;
   onSummaryClick?: (e: React.MouseEvent) => void;
 }
