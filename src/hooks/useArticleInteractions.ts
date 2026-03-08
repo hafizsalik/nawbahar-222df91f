@@ -126,6 +126,7 @@ export function useArticleInteractions(articleId: string) {
 
       if (!error) {
         setIsBookmarked(true);
+        playClickSound();
         toast({ title: "در ذخیره‌ها اضافه شد" });
       }
     }
