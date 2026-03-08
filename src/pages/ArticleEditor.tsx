@@ -377,7 +377,13 @@ const ArticleEditor = () => {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background border-b border-border">
         <div className="flex items-center justify-between px-4 h-11 max-w-screen-md mx-auto">
-          <button onClick={() => navigate(-1)} className="p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors">
+          <button
+            onClick={() => {
+              if (window.history.length > 1) navigate(-1);
+              else navigate("/");
+            }}
+            className="p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
             <ArrowRight size={20} strokeWidth={1.5} />
           </button>
           <h1 className="text-sm font-medium text-foreground">
