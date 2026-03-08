@@ -71,7 +71,7 @@ export function BottomNav() {
           </Link>
 
           {/* VIP */}
-          <NavItem to="/vip" active={isActive("/vip")}>
+          <NavItem to="/vip" active={isActive("/vip")} label="ویژه">
             <BookOpen
               size={21}
               strokeWidth={isActive("/vip") ? 2.2 : 1.4}
