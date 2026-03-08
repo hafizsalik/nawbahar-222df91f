@@ -34,6 +34,7 @@ export function EditProfileModal({
   userId,
   currentDisplayName,
   currentSpecialty,
+  currentBio,
   currentAvatarUrl,
   currentWhatsapp,
   currentFacebook,
