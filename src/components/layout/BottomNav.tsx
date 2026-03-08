@@ -41,8 +41,7 @@ export function BottomNav() {
           <NavItem to="/" active={isActive("/")} label="خانه">
             <Home
               size={21}
-              strokeWidth={isActive("/") ? 2.2 : 1.4}
-              fill={isActive("/") ? "currentColor" : "none"}
+              strokeWidth={isActive("/") ? 1.8 : 1.4}
             />
           </NavItem>
 
@@ -50,7 +49,7 @@ export function BottomNav() {
           <NavItem to="/explore" active={isActive("/explore")} label="جستجو">
             <Search
               size={21}
-              strokeWidth={isActive("/explore") ? 2.2 : 1.4}
+              strokeWidth={isActive("/explore") ? 1.8 : 1.4}
             />
           </NavItem>
 
@@ -74,8 +73,7 @@ export function BottomNav() {
           <NavItem to="/vip" active={isActive("/vip")} label="ویژه">
             <BookOpen
               size={21}
-              strokeWidth={isActive("/vip") ? 2.2 : 1.4}
-              fill={isActive("/vip") ? "currentColor" : "none"}
+              strokeWidth={isActive("/vip") ? 1.8 : 1.4}
             />
           </NavItem>
 
