@@ -56,9 +56,9 @@ export function ArticleCardMetrics({
           >
             <MessageCircle
               size={15}
-              strokeWidth={1.7}
+              strokeWidth={0}
               fill="currentColor"
-              className="opacity-60"
+            />
             />
             {commentCount > 0 && <span>{commentCount}</span>}
           </button>
