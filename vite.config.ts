@@ -37,7 +37,7 @@ export default defineConfig(({ mode }) => ({
         theme_color: "#0f766e",
         orientation: "portrait-primary",
         dir: "rtl",
-        lang: "fa-IR",
+        lang: "fa-AF",
         prefer_related_applications: false,
         categories: ["news", "social", "education", "lifestyle"],
         icons: [
