@@ -29,6 +29,7 @@ export function ArticleCardMetrics({
   commentsOpen,
   onCommentClick,
   reactionSummary,
+  reactionFetched,
   onReact,
   onReactionHover,
 }: ArticleCardMetricsProps) {
