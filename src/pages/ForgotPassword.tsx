@@ -124,6 +124,7 @@ const ForgotPassword = () => {
           </Button>
         </form>
       </div>
+      </div>
     </div>
   );
 };
