@@ -35,23 +35,26 @@ const ForgotPassword = () => {
 
   if (done) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-5" dir="rtl">
+      <div className="min-h-screen bg-background flex flex-col" dir="rtl">
         <SEOHead title="بازیابی رمز عبور" description="ارسال ایمیل بازیابی رمز" ogUrl="/forgot-password" noIndex />
-        <div className="w-full max-w-sm text-center space-y-6 animate-fade-in">
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
-            <Sparkles className="w-7 h-7 text-primary" />
+        <div className="h-1 bg-gradient-to-l from-primary via-accent to-primary/40" />
+        <div className="flex-1 flex items-center justify-center p-5">
+          <div className="w-full max-w-sm text-center space-y-6 animate-fade-in">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+              <Sparkles className="w-7 h-7 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">ایمیل ارسال شد ✅</h1>
+              <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                لینک بازیابی رمز عبور به <span className="font-medium text-foreground">{email}</span> ارسال شد.<br />
+                ایمیل خود را بررسی کنید.
+              </p>
+            </div>
+            <Button variant="outline" onClick={() => navigate("/auth")} className="gap-2">
+              <ArrowRight size={16} />
+              بازگشت به ورود
+            </Button>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">ایمیل ارسال شد ✅</h1>
-            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-              لینک بازیابی رمز عبور به <span className="font-medium text-foreground">{email}</span> ارسال شد.<br />
-              ایمیل خود را بررسی کنید.
-            </p>
-          </div>
-          <Button variant="outline" onClick={() => navigate("/auth")} className="gap-2">
-            <ArrowRight size={16} />
-            بازگشت به ورود
-          </Button>
         </div>
       </div>
     );
