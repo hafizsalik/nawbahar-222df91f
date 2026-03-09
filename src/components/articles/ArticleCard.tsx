@@ -131,8 +131,8 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
           </div>
           <div
             className={cn(
-              "w-[100px] h-[100px] flex-shrink-0 rounded-xl overflow-hidden relative bg-muted/20 self-start shadow-sm border border-border/20 transition-all duration-300",
-              hasBeenRead && "opacity-50 saturate-[0.3] blur-[0.5px]"
+              "w-[104px] h-[104px] flex-shrink-0 rounded-xl overflow-hidden relative bg-muted/30 self-start border border-border/15 transition-all duration-300",
+              hasBeenRead && "opacity-45 saturate-[0.25] blur-[0.5px]"
             )}
           >
             {!imageLoaded && <div className="absolute inset-0 skeleton" />}
