@@ -5,7 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { queryClient } from "@/lib/queryClient";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
-import { lazy, Suspense, forwardRef } from "react";
+import { lazy, Suspense } from "react";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import Index from "./pages/Index";
 
@@ -33,7 +33,7 @@ function PageFallback() {
   );
 }
 
-const App = forwardRef<HTMLDivElement>(function App(_props, _ref) {
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -65,6 +65,6 @@ const App = forwardRef<HTMLDivElement>(function App(_props, _ref) {
       </TooltipProvider>
     </QueryClientProvider>
   );
-});
+}
 
 export default App;
