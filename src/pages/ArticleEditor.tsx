@@ -10,9 +10,10 @@ import { compressArticleImage } from "@/lib/imageCompression";
 import { sanitizeError, validation } from "@/lib/errorHandler";
 import { playSuccessSound } from "@/lib/sounds";
 import { toPersianNumber } from "@/lib/utils";
-import type { User } from "@supabase/supabase-js";
 import { useArticleSearch, addCitation } from "@/hooks/useCitations";
 import { usePublishingCapacity } from "@/hooks/usePublishingCapacity";
+import { useProtectedRoute } from "@/hooks/useProtectedRoute";
+import { useAuth } from "@/hooks/useAuth";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -49,7 +50,6 @@ const ArticleEditor = () => {
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
   const [parentArticle, setParentArticle] = useState<{ id: string; title: string } | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   
@@ -70,6 +70,8 @@ const ArticleEditor = () => {
   const [showCitationSearch, setShowCitationSearch] = useState(false);
   const { results: citationResults, searching: citationSearching, searchArticles } = useArticleSearch();
   const { stats: capacityStats, canPublish, loading: capacityLoading } = usePublishingCapacity();
+  const { loading: authLoading, isAuthenticated } = useProtectedRoute();
+  const { user } = useAuth();
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textFileInputRef = useRef<HTMLInputElement>(null);
@@ -138,18 +140,15 @@ const ArticleEditor = () => {
     }
   }, [responseToId]);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) navigate("/auth");
-      else setUser(session.user);
-    });
+  // Remove old auth logic - handled by useProtectedRoute
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      if (!session?.user) navigate("/auth");
-      else setUser(session.user);
-    });
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+  if (authLoading) {
+    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+  }
+
+  if (!isAuthenticated) {
+    return null; // useProtectedRoute handles redirect
+  }
 
   const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
   const readTime = Math.max(1, Math.ceil(wordCount / 200));

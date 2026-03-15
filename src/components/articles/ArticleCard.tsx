@@ -11,6 +11,7 @@ import { SlideDownComments } from "./SlideDownComments";
 import { formatSolarShort } from "@/lib/solarHijri";
 import { ArticleCardMetrics } from "./ArticleCardMetrics";
 import defaultCover from "@/assets/default-cover.jpg";
+import { storage } from "@/lib/storage";
 
 interface ArticleCardProps {
   article: FeedArticle;
@@ -23,11 +24,7 @@ function getExcerpt(content: string, maxChars: number = 110): string {
 }
 
 function isArticleRead(articleId: string): boolean {
-  try {
-    return localStorage.getItem(`article_viewed_${articleId}`) !== null;
-  } catch {
-    return false;
-  }
+  return storage.get(`article_viewed_${articleId}`, null) !== null;
 }
 
 export function ArticleCard({ article, onDelete }: ArticleCardProps) {
@@ -89,11 +86,11 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
       <Link to={`/article/${article.id}`} className="block px-5 pt-5 pb-1">
         <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-1.5 group/author min-w-0">
-            <button onClick={handleAuthorClick} className="flex items-center gap-1.5 min-w-0">
+            <button onClick={handleAuthorClick} className="flex items-center gap-1.5 min-w-0" aria-label={`View ${article.author?.display_name}'s profile`}>
               {article.author?.avatar_url ? (
                 <img
                   src={article.author.avatar_url}
-                  alt=""
+                  alt={article.author?.display_name}
                   className="w-5 h-5 rounded-full object-cover flex-shrink-0"
                   loading="lazy"
                 />

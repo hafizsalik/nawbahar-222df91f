@@ -4,10 +4,10 @@ import { QueryClient } from "@tanstack/react-query";
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Keep cached data for 30 minutes
-      gcTime: 1000 * 60 * 30,
-      // Consider data fresh for 30 seconds
-      staleTime: 1000 * 30,
+      // Keep cached data for 5 minutes (reduced from 30)
+      gcTime: 1000 * 60 * 5,
+      // Consider data fresh for 1 minute (increased from 30s)
+      staleTime: 1000 * 60,
       // Retry failed requests up to 2 times
       retry: 2,
       // Keep previous data while fetching new data

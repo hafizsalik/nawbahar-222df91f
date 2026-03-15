@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from "@/integrations/supabase/client";
 
 export interface FeedArticle {
@@ -26,100 +26,91 @@ export interface FeedArticle {
 const PAGE_SIZE = 15;
 
 export function usePublishedArticles() {
-  const [articles, setArticles] = useState<FeedArticle[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+    refetch
+  } = useInfiniteQuery({
+    queryKey: ['articles-published'],
+    queryFn: async ({ pageParam = 0 }) => {
+      const { data: articlesData, error: articlesError } = await supabase
+        .from("articles")
+        .select("id, title, content, cover_image_url, tags, created_at, save_count, view_count, author_id, comment_count, reaction_count, parent_article_id")
+        .eq("status", "published")
+        .order("created_at", { ascending: false })
+        .range(pageParam, pageParam + PAGE_SIZE - 1);
 
-  const fetchArticles = useCallback(async (offset = 0, append = false) => {
-    if (!append) setLoading(true);
-    else setLoadingMore(true);
+      if (articlesError) throw articlesError;
 
-    const { data: articlesData, error: articlesError } = await supabase
-      .from("articles")
-      .select("id, title, content, cover_image_url, tags, created_at, save_count, view_count, author_id, comment_count, reaction_count, parent_article_id")
-      .eq("status", "published")
-      .order("created_at", { ascending: false })
-      .range(offset, offset + PAGE_SIZE - 1);
+      const data = articlesData || [];
+      if (data.length === 0) return [];
 
-    if (articlesError) {
-      setError(articlesError.message);
-      if (!append) setArticles([]);
-      setLoading(false);
-      setLoadingMore(false);
-      return;
-    }
+      // Get unique author IDs
+      const authorIds = [...new Set(data.map(a => a.author_id))];
 
-    const data = articlesData || [];
-    setHasMore(data.length === PAGE_SIZE);
+      // Get unique parent article IDs for response articles
+      const parentIds = [...new Set(data.map(a => a.parent_article_id).filter(Boolean))] as string[];
 
-    // Get unique author IDs
-    const authorIds = [...new Set(data.map(a => a.author_id))];
-    
-    // Get unique parent article IDs for response articles
-    const parentIds = [...new Set(data.map(a => a.parent_article_id).filter(Boolean))] as string[];
+      // Batch fetch authors and parent titles in parallel
+      const [profilesResult, parentsResult] = await Promise.all([
+        authorIds.length > 0
+          ? supabase.from("profiles").select("id, display_name, avatar_url, specialty, reputation_score").in("id", authorIds)
+          : { data: [] },
+        parentIds.length > 0
+          ? supabase.from("articles").select("id, title").in("id", parentIds)
+          : { data: [] },
+      ]);
 
-    // Batch fetch authors and parent titles in parallel
-    const [profilesResult, parentsResult] = await Promise.all([
-      authorIds.length > 0
-        ? supabase.from("profiles").select("id, display_name, avatar_url, specialty, reputation_score").in("id", authorIds)
-        : { data: [] },
-      parentIds.length > 0
-        ? supabase.from("articles").select("id, title").in("id", parentIds)
-        : { data: [] },
-    ]);
+      const profilesMap = new Map((profilesResult.data || []).map(p => [p.id, p]));
+      const parentsMap = new Map((parentsResult.data || []).map(p => [p.id, p.title]));
 
-    const profilesMap = new Map((profilesResult.data || []).map(p => [p.id, p]));
-    const parentsMap = new Map((parentsResult.data || []).map(p => [p.id, p.title]));
+      const transformed: FeedArticle[] = data.map((item) => {
+        const profile = profilesMap.get(item.author_id);
+        return {
+          id: item.id,
+          title: item.title,
+          content: item.content,
+          cover_image_url: item.cover_image_url,
+          tags: item.tags || [],
+          created_at: item.created_at,
+          save_count: item.save_count || 0,
+          view_count: item.view_count || 0,
+          comment_count: item.comment_count || 0,
+          reaction_count: item.reaction_count || 0,
+          parent_article_id: item.parent_article_id,
+          parent_title: item.parent_article_id ? parentsMap.get(item.parent_article_id) || null : null,
+          author_id: item.author_id,
+          author: profile ? {
+            display_name: profile.display_name,
+            avatar_url: profile.avatar_url,
+            specialty: profile.specialty,
+            reputation_score: profile.reputation_score || 0,
+          } : undefined,
+        };
+      });
 
-    const transformed: FeedArticle[] = data.map((item) => {
-      const profile = profilesMap.get(item.author_id);
-      return {
-        id: item.id,
-        title: item.title,
-        content: item.content,
-        cover_image_url: item.cover_image_url,
-        tags: item.tags || [],
-        created_at: item.created_at,
-        save_count: item.save_count || 0,
-        view_count: item.view_count || 0,
-        comment_count: item.comment_count || 0,
-        reaction_count: item.reaction_count || 0,
-        parent_article_id: item.parent_article_id,
-        parent_title: item.parent_article_id ? parentsMap.get(item.parent_article_id) || null : null,
-        author_id: item.author_id,
-        author: profile ? {
-          display_name: profile.display_name,
-          avatar_url: profile.avatar_url,
-          specialty: profile.specialty,
-          reputation_score: profile.reputation_score || 0,
-        } : undefined,
-      };
-    });
+      return transformed;
+    },
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length === PAGE_SIZE
+        ? allPages.length * PAGE_SIZE
+        : undefined,
+    initialPageParam: 0,
+  });
 
-    if (append) {
-      setArticles(prev => [...prev, ...transformed]);
-    } else {
-      setArticles(transformed);
-    }
-    setLoading(false);
-    setLoadingMore(false);
-  }, []);
+  const articles = data?.pages.flatMap(p => p) ?? [];
 
-  useEffect(() => {
-    fetchArticles(0, false);
-  }, [fetchArticles]);
-
-  const loadMore = useCallback(() => {
-    if (loadingMore || !hasMore) return;
-    fetchArticles(articles.length, true);
-  }, [articles.length, loadingMore, hasMore, fetchArticles]);
-
-  const refetch = useCallback(() => {
-    setHasMore(true);
-    fetchArticles(0, false);
-  }, [fetchArticles]);
-
-  return { articles, loading, loadingMore, hasMore, error, refetch, loadMore };
+  return {
+    articles,
+    loading: isLoading,
+    loadingMore: isFetchingNextPage,
+    hasMore: hasNextPage ?? false,
+    error,
+    refetch,
+    loadMore: () => fetchNextPage(),
+  };
 }
