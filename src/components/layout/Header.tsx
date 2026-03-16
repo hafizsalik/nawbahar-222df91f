@@ -71,7 +71,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/40 safe-top" style={{ boxShadow: '0 1px 8px -2px rgba(0,0,0,0.06)' }}>
       <div className="flex items-center justify-between px-4 h-11 max-w-lg mx-auto">
-        <Link to="/" className="flex items-center gap-1.5 group">
+        <Link to="/" className="flex items-center gap-1.5 group interactive">
           <img src={nawbaharLogo} alt="نوبهار" className="w-6 h-6" />
           <span className="text-[15px] font-extrabold tracking-tight text-foreground leading-none">
             نوبهار
@@ -81,7 +81,7 @@ export function Header() {
         <div className="flex items-center gap-0.5">
           <Link 
             to="/notifications" 
-            className="relative flex items-center justify-center w-9 h-9 text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-md"
+            className="relative flex items-center justify-center w-9 h-9 text-muted-foreground hover:text-foreground interactive focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-md"
             aria-label={`اعلان‌ها${unreadCount > 0 ? ` - ${toPersianNumber(unreadCount)} خوانده نشده` : ''}`}
           >
             <Bell size={19} strokeWidth={1.5} />
