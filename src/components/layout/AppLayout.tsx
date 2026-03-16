@@ -14,7 +14,7 @@ export function AppLayout({ children, hideHeader, hideNav, className }: AppLayou
     <div className="min-h-screen bg-background flex flex-col">
       {!hideHeader && <Header />}
       <main 
-        className={`${!hideNav ? 'pb-20' : ''} max-w-[540px] mx-auto w-full flex-1 ${className || ''}`}
+        className={`${!hideNav ? 'pb-20' : ''} w-full mx-auto max-w-[940px] px-3 sm:px-4 md:px-6 lg:px-8 flex-1 ${className || ''}`}
         role="main"
       >
         {children}
