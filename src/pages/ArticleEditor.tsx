@@ -10,6 +10,7 @@ import { compressArticleImage } from "@/lib/imageCompression";
 import { sanitizeError, validation } from "@/lib/errorHandler";
 import { playSuccessSound } from "@/lib/sounds";
 import { toPersianNumber } from "@/lib/utils";
+import { storage } from "@/lib/storage";
 import { useArticleSearch, addCitation } from "@/hooks/useCitations";
 import { usePublishingCapacity } from "@/hooks/usePublishingCapacity";
 import { useProtectedRoute } from "@/hooks/useProtectedRoute";
@@ -114,7 +115,7 @@ const ArticleEditor = () => {
   // Load draft on mount (only for new articles)
   useEffect(() => {
     if (!responseToId && !editId) {
-      const savedDraft = localStorage.getItem(DRAFT_KEY);
+      const savedDraft = storage.get(DRAFT_KEY, null);
       if (savedDraft) {
         try {
           const draft = JSON.parse(savedDraft);
@@ -129,7 +130,7 @@ const ArticleEditor = () => {
   // Auto-save draft
   useEffect(() => {
     if (!responseToId) {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify({ title, content, tags }));
+      storage.set(DRAFT_KEY, JSON.stringify({ title, content, tags }));
     }
   }, [title, content, tags, responseToId]);
 
@@ -167,9 +168,17 @@ const ArticleEditor = () => {
       // Step 1: Upload cover image if any
       let coverImageUrl = coverPreview;
       if (coverImage) {
-        const fileExt = coverImage.name.split('.').pop();
+        // Compress image before upload
+        const compressedImage = await compressArticleImage(coverImage, {
+          maxSizeKB: 800,
+          maxWidth: 1920,
+          maxHeight: 1080,
+          quality: 0.82,
+        });
+        
+        const fileExt = compressedImage.name.split('.').pop() || 'webp';
         const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-        const { error: uploadError } = await supabase.storage.from('article-covers').upload(fileName, coverImage);
+        const { error: uploadError } = await supabase.storage.from('article-covers').upload(fileName, compressedImage);
         if (uploadError) throw uploadError;
         const { data: urlData } = supabase.storage.from('article-covers').getPublicUrl(fileName);
         coverImageUrl = urlData.publicUrl;

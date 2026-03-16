@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 // Extend ServiceWorkerRegistration to include pushManager
 interface PushServiceWorkerRegistration extends ServiceWorkerRegistration {
@@ -51,6 +52,20 @@ export function usePushNotifications() {
     try {
       const perm = await Notification.requestPermission();
       setPermission(perm);
+      
+      if (perm === 'denied') {
+        // Can't get permission, show help
+        toast({
+          title: 'اعلان‌ها غیرفعال است',
+          description: 'لطفاً در تنظیمات مرورگر اعلان‌ها را فعال کنید',
+          action: {
+            label: 'کمک',
+            onClick: () => window.open('/help/notifications'),
+          }
+        });
+        return false;
+      }
+
       if (perm !== 'granted') return false;
 
       const reg = await navigator.serviceWorker.ready as PushServiceWorkerRegistration;
@@ -75,7 +90,7 @@ export function usePushNotifications() {
       console.error('Push subscription failed:', error);
       return false;
     }
-  }, [user, isSupported]);
+  }, [user, isSupported, toast]);
 
   const unsubscribe = useCallback(async () => {
     try {

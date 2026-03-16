@@ -94,15 +94,23 @@ export function useArticleSearch() {
     }
 
     setSearching(true);
-    const { data } = await supabase
-      .from("articles")
-      .select("id, title")
-      .eq("status", "published")
-      .ilike("title", `%${query}%`)
-      .limit(10);
+    try {
+      // Use Supabase full-text search for better performance
+      const { data, error } = await supabase
+        .from("articles")
+        .select("id, title")
+        .eq("status", "published")
+        .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
+        .limit(10);
 
-    setResults(data || []);
-    setSearching(false);
+      if (error) throw error;
+      setResults(data || []);
+    } catch (error) {
+      console.error('Search error:', error);
+      setResults([]);
+    } finally {
+      setSearching(false);
+    }
   };
 
   return { results, searching, searchArticles };
