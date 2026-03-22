@@ -203,12 +203,12 @@ const AdminDashboard = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full grid grid-cols-6 mb-4 h-auto bg-muted/30 rounded-xl p-1">
             {[
-              { value: "stats", icon: TrendingUp, label: "آمار" },
+              { value: "stats", icon: TrendingUp, label: "آمار کلی" },
               { value: "analytics", icon: BarChart3, label: "تحلیل‌ها" },
-              { value: "pending", icon: Clock, label: "انتظار", badge: stats?.pendingArticles },
-              { value: "published", icon: CheckCircle, label: "منتشر" },
+              { value: "pending", icon: Clock, label: "در انتظار انتشار", badge: stats?.pendingArticles },
+              { value: "published", icon: CheckCircle, label: "منتشر شده" },
               { value: "rejected", icon: XCircle, label: "رد" },
-              { value: "reports", icon: Flag, label: "گزارش", badge: stats?.reportedComments, badgeVariant: "destructive" as const },
+              { value: "reports", icon: Flag, label: "گزارش  شده", badge: stats?.reportedComments, badgeVariant: "destructive" as const },
             ].map(({ value, icon: Icon, label, badge, badgeVariant }) => (
               <TabsTrigger key={value} value={value} className="text-[10px] sm:text-xs py-2 px-1 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm relative">
                 <Icon size={12} className="ml-1 hidden sm:inline" />
