@@ -6,6 +6,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { toPersianNumber, cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
 import nawbaharLogo from "@/assets/nawbahar-logo.png";
+import { NotificationBell, ThemeToggle, LogoutConfirmDialog } from "@/components/EnhancedButtons";
 
 export function Header() {
   const { unreadCount } = useNotifications();
@@ -14,6 +15,9 @@ export function Header() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
@@ -62,14 +66,31 @@ export function Header() {
   };
 
   const handleSignOut = async () => {
-    setMenuOpen(false);
-    await signOut();
-    navigate("/");
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmSignOut = async () => {
+    setIsLoggingOut(true);
+    try {
+      await signOut();
+      setMenuOpen(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setIsLoggingOut(false);
+      setShowLogoutConfirm(false);
+    }
+  };
+
+  const handleThemeToggle = () => {
+    setIsDark(!isDark);
   };
 
 
   return (
-    <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/40 safe-top" style={{ boxShadow: '0 1px 8px -2px rgba(0,0,0,0.06)' }}>
+    <>
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/40 safe-top" style={{ boxShadow: '0 1px 8px -2px rgba(0,0,0,0.06)' }}>
       <div className="flex items-center justify-between px-4 h-11 max-w-lg mx-auto">
         <Link to="/" className="flex items-center gap-1.5 group interactive">
           <img src={nawbaharLogo} alt="نوبهار" className="w-6 h-6" />
@@ -78,19 +99,12 @@ export function Header() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-0.5">
-          <Link 
-            to="/notifications" 
-            className="relative flex items-center justify-center w-9 h-9 text-muted-foreground hover:text-foreground interactive focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-md"
-            aria-label={`اعلان‌ها${unreadCount > 0 ? ` - ${toPersianNumber(unreadCount)} خوانده نشده` : ''}`}
-          >
-            <Bell size={19} strokeWidth={1.5} />
-            {unreadCount > 0 && (
-              <span className="absolute top-1 right-0.5 min-w-[16px] h-[16px] flex items-center justify-center text-[8px] font-bold text-accent-foreground bg-accent rounded-full px-0.5 ring-2 ring-background">
-                {unreadCount > 9 ? "۹+" : toPersianNumber(unreadCount)}
-              </span>
-            )}
-          </Link>
+        <div className="flex items-center gap-1.5">
+          {/* Enhanced Notifications Button */}
+          <NotificationBell 
+            unreadCount={unreadCount}
+            onClick={() => navigate('/notifications')}
+          />
 
           <div className="relative" ref={menuRef}>
             <button
@@ -103,18 +117,12 @@ export function Header() {
 
             {menuOpen && (
               <div className="absolute left-0 top-full mt-1.5 w-52 bg-card border border-border rounded-xl shadow-lg animate-scale-in origin-top-left z-50 overflow-hidden">
-                {/* Theme toggle */}
+                {/* Enhanced Theme Toggle */}
                 <div className="px-3 py-2.5 border-b border-border/50">
-                  <button
-                    onClick={() => setIsDark(!isDark)}
-                    className={cn(
-                      "flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-full transition-all",
-                      isDark ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    {isDark ? <Moon size={13} strokeWidth={1.5} /> : <Sun size={13} strokeWidth={1.5} />}
-                    {isDark ? "تاریک" : "روشن"}
-                  </button>
+                  <ThemeToggle 
+                    isDark={isDark} 
+                    onToggle={handleThemeToggle}
+                  />
                 </div>
 
                 {isAdmin && (
@@ -178,5 +186,12 @@ export function Header() {
         </div>
       </div>
     </header>
+    <LogoutConfirmDialog
+      isOpen={showLogoutConfirm}
+      onClose={() => setShowLogoutConfirm(false)}
+      onConfirm={confirmSignOut}
+      isLoading={isLoggingOut}
+    />
+    </>
   );
 }
