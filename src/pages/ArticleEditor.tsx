@@ -97,7 +97,7 @@ const ArticleEditor = () => {
           .maybeSingle();
 
         if (error || !data) {
-          toast({ title: "مقاله پیدا نشد", variant: "destructive" });
+          toast({ title: "مقاله مورد نظر پیدا نشد", variant: "destructive" });
           navigate("/", { replace: true });
           return;
         }
@@ -655,8 +655,8 @@ const ArticleEditor = () => {
                       key={i}
                       onClick={(e) => { e.stopPropagation(); setSelectedIssue(selectedIssue?.word === part.issue!.word ? null : part.issue!); }}
                       className={`relative cursor-pointer border-b-2 transition-colors ${part.issue.type === "spelling" ? "border-destructive/60 bg-destructive/8" :
-                          part.issue.type === "grammar" ? "border-yellow-500/60 bg-yellow-500/8" :
-                            "border-blue-500/60 bg-blue-500/8"
+                        part.issue.type === "grammar" ? "border-yellow-500/60 bg-yellow-500/8" :
+                          "border-blue-500/60 bg-blue-500/8"
                         } ${selectedIssue?.word === part.issue.word ? "ring-2 ring-primary/30 rounded-sm" : ""}`}
                     >
                       {part.text}
@@ -665,7 +665,7 @@ const ArticleEditor = () => {
                         <span className="absolute bottom-full right-0 mb-1 z-10 w-56 p-2.5 bg-popover border border-border rounded-lg shadow-lg text-right animate-fade-in" onClick={(e) => e.stopPropagation()}>
                           <span className="flex items-center gap-1.5 mb-1.5">
                             <span className={`w-1.5 h-1.5 rounded-full ${part.issue!.type === "spelling" ? "bg-destructive" :
-                                part.issue!.type === "grammar" ? "bg-yellow-500" : "bg-blue-500"
+                              part.issue!.type === "grammar" ? "bg-yellow-500" : "bg-blue-500"
                               }`} />
                             <span className="text-[10px] text-muted-foreground">
                               {part.issue!.type === "spelling" ? "املایی" : part.issue!.type === "grammar" ? "دستوری" : "سبکی"}
