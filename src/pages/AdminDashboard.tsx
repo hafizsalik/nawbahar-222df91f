@@ -64,7 +64,7 @@ const AdminDashboard = () => {
     if (!session?.user) { navigate("/auth"); return; }
     const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", session.user.id).eq("role", "admin").maybeSingle();
     if (error || !data) {
-      toast({ title: "دسترسی غیرمجاز", description: "شما دسترسی ادمین ندارید", variant: "destructive" });
+      toast({ title: "دسترسی غیرمجاز", description: "شما دسترسی ادمین را ندارید", variant: "destructive" });
       navigate("/"); return;
     }
     setIsAdmin(true);
