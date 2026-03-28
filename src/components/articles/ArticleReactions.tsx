@@ -1,75 +1,65 @@
-import { useState } from "react";
-import { type ReactionKey, type ReactionSummary } from "@/hooks/useCardReactions";
-import { cn, toPersianNumber } from "@/lib/utils";
-import { MessageCircle } from "lucide-react";
-import { ReactionDetailsModal } from "./ReactionDetailsModal";
-import { ReactionPicker } from "./ReactionPicker";
+import { ThumbsUp, Heart, Smile, Flame, Star } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-interface ArticleReactionsProps {
-  articleId: string;
-  summary: ReactionSummary;
-  commentCount: number;
+export type ReactionKey = "like" | "love" | "funny" | "fire" | "star";
+
+const reactionIcons: Record<ReactionKey, any> = {
+  like: ThumbsUp,
+  love: Heart,
+  funny: Smile,
+  fire: Flame,
+  star: Star,
+};
+
+interface Props {
+  userReaction?: ReactionKey | null;
   onReact: (type: ReactionKey) => void;
-  onCommentClick?: () => void;
+  topTypes: ReactionKey[];
+  summaryText?: string;
+  onSummaryClick?: () => void;
 }
 
-export function ArticleReactions({ articleId, summary, commentCount, onReact, onCommentClick }: ArticleReactionsProps) {
-  const [showDetails, setShowDetails] = useState(false);
-  const { userReaction, totalCount, topTypes, reactorNames } = summary;
-
-  const buildLabel = (): string | null => {
-    if (totalCount === 0) return null;
-    const names: string[] = [];
-    if (userReaction) names.push("شما");
-    reactorNames.forEach((n) => { if (!names.includes(n)) names.push(n); });
-    if (names.length === 0) return `${toPersianNumber(totalCount)} نفر`;
-    const shown = names.slice(0, 2);
-    const remaining = Math.max(totalCount - shown.length, 0);
-    let text = shown.join("، ");
-    if (remaining > 0) text += ` و ${toPersianNumber(remaining)} نفر دیگر`;
-    return text;
-  };
-
-  const label = buildLabel();
-  const hasReactions = totalCount > 0;
-
-  const handleSummaryClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (hasReactions) setShowDetails(true);
-  };
-
+export function ReactionPicker({
+  userReaction,
+  onReact,
+  topTypes,
+  summaryText,
+  onSummaryClick,
+}: Props) {
   return (
-    <>
-      <div className="flex items-center justify-between py-4 my-6 border-t border-b border-border/30">
-        <div className="flex items-center gap-4">
-          {/* Comment */}
-          <button
-            onClick={onCommentClick}
-            className="flex items-center gap-1 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <MessageCircle size={14} strokeWidth={1.5} />
-            <span className="text-[11.5px]">
-              {commentCount > 0 ? `${toPersianNumber(commentCount)} نظر` : "نظر"}
-            </span>
-          </button>
+    <div className="flex items-center gap-2">
 
-          {/* Reaction picker — same as card */}
-          <ReactionPicker
-            userReaction={userReaction}
-            onReact={onReact}
-            topTypes={topTypes}
-            summaryText={label || undefined}
-            onSummaryClick={hasReactions ? handleSummaryClick : undefined}
-          />
-        </div>
+      {/* Reaction buttons */}
+      <div className="flex items-center gap-1">
+        {Object.entries(reactionIcons).map(([key, Icon]) => {
+          const active = userReaction === key;
+
+          return (
+            <button
+              key={key}
+              onClick={() => onReact(key as ReactionKey)}
+              className={cn(
+                "p-1.5 rounded-full transition",
+                active
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Icon size={16} strokeWidth={1.8} />
+            </button>
+          );
+        })}
       </div>
 
-      <ReactionDetailsModal
-        articleId={articleId}
-        isOpen={showDetails}
-        onClose={() => setShowDetails(false)}
-      />
-    </>
+      {/* Summary text */}
+      {summaryText && (
+        <button
+          onClick={onSummaryClick}
+          className="text-[11px] text-muted-foreground hover:text-foreground"
+        >
+          {summaryText}
+        </button>
+      )}
+    </div>
   );
 }
